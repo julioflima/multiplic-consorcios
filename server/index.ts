@@ -17,7 +17,7 @@ const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000'
 
 const signContractSchema = z.object({
   email: z.string().email(),
-  name: z.string().min(1).default('Afiliado Multcon'),
+  name: z.string().min(1).default('Afiliado Multiplic Consórcios'),
 })
 
 app.use(

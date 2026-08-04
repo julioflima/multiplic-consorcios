@@ -28,7 +28,7 @@ export default async function AffiliateContractPage({
         <div className="container site-header">
           <Link href="/">
             <Image
-              alt="Multiplic Seguros"
+              alt="Multiplic Consórcios"
               className="brand-logo"
               height={872}
               priority
@@ -42,7 +42,7 @@ export default async function AffiliateContractPage({
       <section className="container contract-card">
         <div>
           <span className="eyebrow">PDF oficial para assinatura</span>
-          <h1 className="contract-title">Contrato de afiliado Multcon</h1>
+          <h1 className="contract-title">Contrato de afiliado Multiplic Consórcios</h1>
           <p className="section-copy">
             Você está autenticado como {session.user.email}. Leia o documento e
             confirme a assinatura eletrônica para receber a confirmação por
@@ -58,7 +58,7 @@ export default async function AffiliateContractPage({
 
         <div className="contract-panel">
           <iframe
-            title="Contrato de afiliado Multcon"
+            title="Contrato de afiliado Multiplic Consórcios"
             src="/api/contracts/affiliate"
           />
         </div>

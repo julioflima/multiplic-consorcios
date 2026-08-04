@@ -4,8 +4,8 @@ import Link from 'next/link'
 const terms = [
   {
     eyebrow: 'Partes',
-    title: 'Multiplic Seguros e afiliado',
-    copy: 'A parceria acontece entre a Multiplic Seguros, por meio da plataforma Multcon, e o influenciador autenticado.',
+    title: 'Multiplic Consórcios e afiliado',
+    copy: 'A parceria acontece entre a Multiplic Consórcios e o influenciador autenticado.',
   },
   {
     eyebrow: 'Indicação',
@@ -40,7 +40,7 @@ export default function AffiliatesPage() {
       <header className="container site-header">
         <Link href="/">
           <Image
-            alt="Multiplic Seguros"
+            alt="Multiplic Consórcios"
             className="brand-logo"
             height={872}
             priority
@@ -55,7 +55,7 @@ export default function AffiliatesPage() {
       </header>
 
       <section className="container affiliate-hero">
-        <span className="eyebrow">Contrato de parceria · Multcon</span>
+        <span className="eyebrow">Contrato de parceria · Multiplic Consórcios</span>
         <h1 className="affiliate-title">
           Indique consórcios com uma parceria clara antes do primeiro cupom.
         </h1>

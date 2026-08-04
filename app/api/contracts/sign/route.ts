@@ -11,7 +11,7 @@ import { authOptions } from '@/lib/auth'
 export async function POST() {
   const session = await getServerSession(authOptions)
   const email = session?.user?.email
-  const name = session?.user?.name ?? 'Afiliado Multcon'
+  const name = session?.user?.name ?? 'Afiliado Multiplic Consórcios'
 
   if (!email) {
     return NextResponse.json(

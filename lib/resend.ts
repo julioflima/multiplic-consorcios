@@ -20,12 +20,12 @@ export async function sendContractSignedEmail(
   const payload: ResendEmailPayload = {
     from,
     to: [signature.email],
-    subject: 'Contrato de afiliado Multcon assinado',
+    subject: 'Contrato de afiliado Multiplic Consórcios assinado',
     html: `
       <div style="font-family: Arial, sans-serif; color: #12213b; line-height: 1.6;">
         <h1>Contrato assinado com sucesso</h1>
         <p>Olá, ${signature.name}.</p>
-        <p>Confirmamos a assinatura eletrônica do seu contrato de parceria comercial com a Multcon, uma plataforma da Multiplic Seguros.</p>
+        <p>Confirmamos a assinatura eletrônica do seu contrato de parceria comercial com a Multiplic Consórcios.</p>
         <p><strong>Versão:</strong> ${signature.contractVersion}<br /><strong>Data:</strong> ${new Date(
           signature.signedAt,
         ).toLocaleString('pt-BR')}</p>

@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Multcon | Multiplic Seguros',
+  title: 'Multiplic Consórcios',
   description:
-    'Simule seu consórcio com a Multcon, uma plataforma da Multiplic Seguros.',
+    'Simule seu consórcio com a Multiplic Consórcios e receba atendimento consultivo.',
 }
 
 interface RootLayoutProps {

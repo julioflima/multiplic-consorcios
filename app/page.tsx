@@ -192,11 +192,8 @@ export default function HomePage() {
           </div>
 
           <div className="footer-registry">
-            <strong>Dados cadastrais</strong>
             <span>CNPJ 23.974.875/0001-90</span>
             <span>MULTIPLIC CORRETORA DE SEGUROS LTDA</span>
-            <span>Matriz · Aberta em 08/01/2016</span>
-            <span>Situação cadastral informada: ativa</span>
           </div>
 
           <div className="footer-note">

@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model AffiliateContractSignature {
+  id              String   @id @default(cuid())
+  contractVersion String
+  email           String
+  name            String
+  signedAt        DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([email, contractVersion])
+}

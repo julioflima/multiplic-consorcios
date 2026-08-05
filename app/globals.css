@@ -537,7 +537,7 @@ button {
 
 .promo-card--float {
   position: absolute;
-  top: -26px;
+  top: -22px;
   left: 24px;
   max-width: 240px;
   transform: rotate(-2deg);
@@ -879,9 +879,9 @@ button {
 
 .site-footer {
   padding: 72px 0 32px;
-  border-top: 1px solid var(--line);
-  background: var(--surface-alt);
-  color: var(--ink);
+  border-top: 1px solid var(--navy-900);
+  background: var(--navy-950);
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .footer-top {
@@ -895,7 +895,7 @@ button {
   margin: 16px 0 22px;
   font-size: 14px;
   line-height: 1.6;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 400;
   max-width: 300px;
 }
@@ -911,7 +911,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--blue-700);
+  color: var(--gold-300);
   margin-bottom: 16px;
 }
 
@@ -926,13 +926,13 @@ button {
 
 .footer-links a {
   font-size: 14px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.68);
   font-weight: 500;
   transition: color 0.15s ease;
 }
 
 .footer-links a:hover {
-  color: var(--blue-700);
+  color: #fff;
 }
 
 .footer-bottom {
@@ -941,7 +941,7 @@ button {
   justify-content: space-between;
   gap: 32px;
   padding-top: 32px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   flex-wrap: wrap;
 }
 
@@ -953,13 +953,13 @@ button {
 }
 
 .footer-registry strong {
-  color: var(--navy-900);
+  color: #fff;
   font-weight: 700;
   margin-bottom: 2px;
 }
 
 .footer-registry span {
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .footer-note {
@@ -969,7 +969,7 @@ button {
   margin: 0;
   font-size: 13px;
   line-height: 1.6;
-  color: var(--muted-soft);
+  color: rgba(255, 255, 255, 0.45);
   font-weight: 400;
 }
 
@@ -978,6 +978,7 @@ button {
 .simulator-card {
   position: relative;
   z-index: 2;
+  margin-top: 26px;
   padding: 34px;
   border-radius: var(--radius-lg);
   background: var(--surface);

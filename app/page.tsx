@@ -266,7 +266,7 @@ export default function HomePage() {
               alt="Multiplic Consórcios"
               className="footer-logo"
               height={872}
-              src="/brand/logo-horizontal.png"
+              src="/brand/logo-horizontal-branco.png"
               width={3537}
             />
             <p>

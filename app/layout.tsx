@@ -3,6 +3,8 @@ import { Fraunces, Manrope } from 'next/font/google'
 
 import './globals.css'
 
+import { SITE_URL } from '@/lib/seo'
+
 const fraunces = Fraunces({
   subsets: ['latin'],
   variable: '--font-display',
@@ -19,9 +21,24 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: 'Multiplic Consórcios',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Multiplic Consórcios',
+    template: '%s | Multiplic Consórcios',
+  },
   description:
     'Simule seu consórcio com a Multiplic Consórcios e receba atendimento consultivo.',
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    siteName: 'Multiplic Consórcios',
+    title: 'Multiplic Consórcios',
+    description:
+      'Simule seu consórcio com a Multiplic Consórcios e receba atendimento consultivo.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 interface RootLayoutProps {

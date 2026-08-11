@@ -1,9 +1,23 @@
-import { GuidePageContent, getGuideMetadata } from '@/components/guide-page'
+import type { Metadata } from 'next'
 
-const slug = 'seguranca-na-compra'
+import SegurancaPage from '@/components/guides/seguranca-page'
 
-export const metadata = getGuideMetadata(slug)
+const path = '/guias/seguranca-na-compra'
+
+export const metadata: Metadata = {
+  title: 'Segurança na compra',
+  description: 'Na Multiplic Consórcios, confiança e segurança são prioridades.',
+  alternates: {
+    canonical: path,
+  },
+  openGraph: {
+    title: 'Segurança na compra',
+    description: 'Na Multiplic Consórcios, confiança e segurança são prioridades.',
+    url: path,
+    type: 'article',
+  },
+}
 
 export default function Page() {
-  return <GuidePageContent slug={slug} />
+  return <SegurancaPage />
 }

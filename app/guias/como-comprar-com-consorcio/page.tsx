@@ -1,9 +1,23 @@
-import { GuidePageContent, getGuideMetadata } from '@/components/guide-page'
+import type { Metadata } from 'next'
 
-const slug = 'como-comprar-com-consorcio'
+import ComoComprarPage from '@/components/guides/como-comprar-page'
 
-export const metadata = getGuideMetadata(slug)
+const path = '/guias/como-comprar-com-consorcio'
+
+export const metadata: Metadata = {
+  title: 'Como Comprar?',
+  description: 'Comprar um consórcio da Multiplic Consórcios é simples e muito seguro. Você faz tudo pelo celular!',
+  alternates: {
+    canonical: path,
+  },
+  openGraph: {
+    title: 'Como Comprar?',
+    description: 'Comprar um consórcio da Multiplic Consórcios é simples e muito seguro. Você faz tudo pelo celular!',
+    url: path,
+    type: 'article',
+  },
+}
 
 export default function Page() {
-  return <GuidePageContent slug={slug} />
+  return <ComoComprarPage />
 }

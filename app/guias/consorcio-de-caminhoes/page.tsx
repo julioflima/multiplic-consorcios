@@ -1,9 +1,23 @@
-import { GuidePageContent, getGuideMetadata } from '@/components/guide-page'
+import type { Metadata } from 'next'
 
-const slug = 'consorcio-de-caminhoes'
+import CaminhoesPage from '@/components/guides/caminhoes-page'
 
-export const metadata = getGuideMetadata(slug)
+const path = '/guias/consorcio-de-caminhoes'
+
+export const metadata: Metadata = {
+  title: 'Consórcio para Caminhão',
+  description: 'Renove sua frota sem juros e sem entrada',
+  alternates: {
+    canonical: path,
+  },
+  openGraph: {
+    title: 'Consórcio para Caminhão',
+    description: 'Renove sua frota sem juros e sem entrada',
+    url: path,
+    type: 'article',
+  },
+}
 
 export default function Page() {
-  return <GuidePageContent slug={slug} />
+  return <CaminhoesPage />
 }

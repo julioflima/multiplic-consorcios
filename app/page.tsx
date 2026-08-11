@@ -1,28 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { CategoryIcon, TrustIcon, WhatsappIcon } from "@/components/icons";
 import { SimulatorForm } from "@/components/simulator-form";
 import { SiteHeader } from "@/components/site-header";
-import { longFaqs, navGroups } from "@/lib/site-content";
-
-const benefits = [
-  {
-    number: "01",
-    title: "Escolha o bem",
-    copy: "Imóvel, carro, moto ou pesados: a simulação começa com o objetivo real da compra.",
-  },
-  {
-    number: "02",
-    title: "Ajuste crédito ou parcela",
-    copy: "O cliente pode partir do valor da carta ou da parcela que cabe no orçamento.",
-  },
-  {
-    number: "03",
-    title: "Compare planos",
-    copy: "A prévia mostra parcela, crédito, prazo e taxa para facilitar a decisão com um consultor.",
-  },
-];
-
 const categories = [
   {
     slug: "consorcio-de-imoveis",
@@ -49,29 +30,193 @@ const categories = [
     icon: "truck",
   },
   {
-    slug: "consorcio-de-servicos",
-    label: "Serviços",
-    copy: "Reformas, viagens e procedimentos.",
+    slug: "construcao-e-reforma",
+    label: "Reformas",
+    copy: "Construa, reforme ou amplie sem juros.",
     icon: "spark",
   },
 ];
 
-function CategoryIcon({ name }: { name: string }) {
-  const paths: Record<string, string> = {
-    home: "M8 44h56M16 44V23l20-14 20 14v21M25 44V30h14v14M44 44V29h8v15",
-    car: "M9 36h6m42 0h6M19 36h34l-5-13H24l-5 13ZM25 36a6 6 0 1 0 0 12 6 6 0 0 0 0-12ZM47 36a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z",
-    moto: "M18 39a7 7 0 1 0 0 .1M54 39a7 7 0 1 0 0 .1M25 38h13l8-14h8M35 25h-9l7 13M42 24l-5-7h9",
-    truck:
-      "M8 37h36V17H8v20ZM44 37h15v-9l-7-8h-8v17ZM18 37a6 6 0 1 0 0 12 6 6 0 0 0 0-12ZM53 37a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z",
-    spark: "M36 6v18M36 48v18M6 36h18M48 36h18M14 14l13 13M45 45l13 13M58 14 45 27M27 45 14 58",
-  };
+const contactInfo = {
+  whatsappNumber: "5585998614541",
+  whatsappDisplay: "(85) 99861-4541",
+  whatsappMessage: "Olá! Quero simular um consórcio com a Multiplic.",
+};
 
-  return (
-    <svg aria-hidden="true" viewBox="0 0 72 52">
-      <path d={paths[name] ?? paths.home} />
-    </svg>
-  );
-}
+const trustPoints = [
+  {
+    icon: "shield",
+    title: "Regulado por lei",
+    copy: "Consórcio é regulamentado pela Lei 11.795/2008 e fiscalizado pelo Banco Central do Brasil.",
+  },
+  {
+    icon: "check",
+    title: "Sem entrada, sem juros",
+    copy: "Planejamento por consórcio, com taxas previstas em contrato — sem juros de financiamento.",
+  },
+  {
+    icon: "chat",
+    title: "Atendimento consultivo",
+    copy: "Um consultor confirma tabela, regras e documentação antes de qualquer contratação.",
+  },
+  {
+    icon: "clock",
+    title: "Simulação gratuita",
+    copy: "Sem compromisso: simule quantas vezes quiser antes de decidir.",
+  },
+  {
+    icon: "lock",
+    title: "Nunca pague terceiros",
+    copy: "Confirme sempre dados oficiais da proposta e do contrato antes de qualquer pagamento.",
+  },
+  {
+    icon: "spark",
+    title: "Contemplação por sorteio ou lance",
+    copy: "Nenhuma contemplação é garantida antecipadamente — desconfie de quem promete isso.",
+  },
+];
+
+const navGroups = [
+  {
+    label: "Escolha o seu sonho",
+    items: [
+      { label: "Imóveis", href: "/guias/consorcio-de-imoveis" },
+      { label: "Carros", href: "/guias/consorcio-de-carro" },
+      { label: "Motos", href: "/guias/consorcio-de-moto" },
+      { label: "Pesados", href: "/guias/consorcio-de-caminhoes" },
+      { label: "Reformas", href: "/guias/construcao-e-reforma" },
+    ],
+  },
+  {
+    label: "O que é consórcio?",
+    items: [
+      { label: "Bê-á-bá do consórcio", href: "/guias/be-a-ba-do-consorcio" },
+      { label: "Como comprar?", href: "/guias/como-comprar-com-consorcio" },
+    ],
+  },
+  {
+    label: "Precisa de ajuda?",
+    items: [
+      { label: "Quem somos", href: "/guias/quem-somos" },
+      { label: "Segurança na compra", href: "/guias/seguranca-na-compra" },
+    ],
+  },
+];
+
+const longFaqs = [
+  {
+    question: "O que é consórcio?",
+    answer:
+      "Consórcio é uma compra planejada em grupo. Os participantes pagam parcelas mensais para formar um fundo comum e, ao longo do tempo, recebem cartas de crédito por sorteio ou lance.",
+  },
+  {
+    question: "Consórcio tem juros?",
+    answer:
+      "Não funciona como financiamento tradicional. Em vez de juros, há taxa de administração e outros custos previstos em contrato, como fundo de reserva ou seguros quando aplicáveis.",
+  },
+  {
+    question: "O que é carta de crédito?",
+    answer:
+      "É o valor disponibilizado ao participante contemplado para compra do bem ou serviço previsto no contrato do consórcio.",
+  },
+  {
+    question: "Como acontece a contemplação?",
+    answer:
+      "A contemplação pode ocorrer por sorteio ou por lance, conforme as regras do grupo. Antes dela, você segue pagando as parcelas normalmente.",
+  },
+  {
+    question: "O que é lance?",
+    answer:
+      "Lance é uma oferta feita pelo participante para tentar antecipar a contemplação. Existem regras diferentes para lance livre, fixo ou embutido, dependendo do grupo.",
+  },
+  {
+    question: "Contemplação é garantida no início?",
+    answer:
+      "Não. A contemplação depende de sorteio, lance e regras do grupo. Promessas de contemplação imediata devem ser tratadas com cautela.",
+  },
+  {
+    question: "Posso simular por valor da carta ou por parcela?",
+    answer:
+      "Sim. Você pode começar pelo crédito desejado ou informar uma parcela de referência para encontrar faixas compatíveis com o orçamento.",
+  },
+  {
+    question: "Os valores do simulador são finais?",
+    answer:
+      "Não. A simulação é uma prévia. A proposta final depende da tabela vigente, disponibilidade de grupo, análise e regras comerciais aplicáveis.",
+  },
+  {
+    question: "Preciso dar entrada?",
+    answer:
+      "Em geral, consórcio não exige entrada como uma compra financiada. Porém, podem existir taxas, primeira parcela e regras específicas do contrato.",
+  },
+  {
+    question: "Posso usar FGTS no consórcio de imóvel?",
+    answer:
+      "O uso do FGTS depende das regras vigentes, do tipo de operação e das condições do participante. O consultor orienta quais cenários podem ser analisados.",
+  },
+  {
+    question: "Consórcio serve para imóvel usado?",
+    answer:
+      "Pode servir, desde que o bem e a documentação atendam às regras da administradora e do contrato. A aprovação ocorre após análise.",
+  },
+  {
+    question: "Posso comprar carro usado com consórcio?",
+    answer:
+      "Em muitos casos sim, respeitando idade, documentação e critérios da administradora. Esses detalhes devem ser confirmados na proposta.",
+  },
+  {
+    question: "O que acontece se eu atrasar parcelas?",
+    answer:
+      "Atrasos podem gerar encargos, impedir participação em assembleias e afetar direitos do participante. O contrato define consequências e prazos.",
+  },
+  {
+    question: "Posso cancelar um consórcio?",
+    answer:
+      "O cancelamento segue regras contratuais. Pode haver devolução conforme normas do grupo, prazos e assembleias. Leia o contrato antes de contratar.",
+  },
+  {
+    question: "Qual a diferença entre consórcio e financiamento?",
+    answer:
+      "No financiamento você normalmente recebe o bem no início e paga juros. No consórcio, você participa de um grupo e usa a carta após contemplação.",
+  },
+  {
+    question: "Como escolher o melhor plano?",
+    answer:
+      "Compare crédito, parcela, prazo, taxa, objetivo e estratégia de contemplação. A menor parcela nem sempre é a melhor escolha.",
+  },
+  {
+    question: "A Multiplic Consórcios recebe pagamento direto?",
+    answer:
+      "Antes de qualquer pagamento, confirme os dados oficiais da proposta e do contrato com o atendimento. Não pague terceiros sem conferência.",
+  },
+  {
+    question: "Por que falar com consultor depois da simulação?",
+    answer:
+      "Porque o consultor confirma tabela, regras, documentação e disponibilidade. A simulação orienta; a proposta formal precisa de validação.",
+  },
+];
+
+const whatsappHref = `https://wa.me/${contactInfo.whatsappNumber}?text=${encodeURIComponent(
+  contactInfo.whatsappMessage,
+)}`;
+
+const benefits = [
+  {
+    number: "01",
+    title: "Escolha o bem",
+    copy: "Imóvel, carro, moto ou pesados: a simulação começa com o objetivo real da compra.",
+  },
+  {
+    number: "02",
+    title: "Ajuste crédito ou parcela",
+    copy: "O cliente pode partir do valor da carta ou da parcela que cabe no orçamento.",
+  },
+  {
+    number: "03",
+    title: "Compare planos",
+    copy: "A prévia mostra parcela, crédito, prazo e taxa para facilitar a decisão com um consultor.",
+  },
+];
 
 export default function HomePage() {
   return (
@@ -96,24 +241,27 @@ export default function HomePage() {
               <a className="primary-button" href="#simulador">
                 Começar simulação
               </a>
+              <a
+                aria-label="Falar no WhatsApp"
+                className="whatsapp-button"
+                href={whatsappHref}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <WhatsappIcon />
+              </a>
               <a className="ghost-link" href="#como-funciona">
                 Ver como funciona
               </a>
             </div>
 
-            <ul className="trust-row">
-              <li>
-                <span className="trust-dot" />
-                Sem entrada · planejamento por consórcio
-              </li>
-              <li>
-                <span className="trust-dot" />
-                Sem juros · taxas conforme contrato
-              </li>
-              <li>
-                <span className="trust-dot" />
-                Atendimento consultivo especializado
-              </li>
+            <ul className="trust-grid">
+              {trustPoints.slice(0, 6).map((point) => (
+                <li key={point.title}>
+                  <TrustIcon name={point.icon} />
+                  {point.title}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -256,6 +404,41 @@ export default function HomePage() {
           <Link className="primary-button" href="/afiliados">
             Ver parceria
           </Link>
+        </div>
+      </section>
+
+      <section className="section trust-band">
+        <div className="container trust-band-grid">
+          <div className="trust-band-cta">
+            <span className="section-kicker">Fale com um especialista</span>
+            <h2>Tire dúvidas antes de decidir.</h2>
+            <p>
+              Prefere conversar em vez de preencher formulário? Chame nosso
+              time no WhatsApp e receba orientação para simular o consórcio
+              ideal para você.
+            </p>
+            <a
+              className="trust-band-whatsapp"
+              href={whatsappHref}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <WhatsappIcon />
+              WhatsApp {contactInfo.whatsappDisplay}
+            </a>
+          </div>
+
+          <ul className="trust-band-list">
+            {trustPoints.map((point) => (
+              <li key={point.title}>
+                <TrustIcon name={point.icon} />
+                <div>
+                  <strong>{point.title}</strong>
+                  <span>{point.copy}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

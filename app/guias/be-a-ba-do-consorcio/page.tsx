@@ -1,9 +1,23 @@
-import { GuidePageContent, getGuideMetadata } from '@/components/guide-page'
+import type { Metadata } from 'next'
 
-const slug = 'be-a-ba-do-consorcio'
+import BeABaPage from '@/components/guides/be-a-ba-page'
 
-export const metadata = getGuideMetadata(slug)
+const path = '/guias/be-a-ba-do-consorcio'
+
+export const metadata: Metadata = {
+  title: 'O bê-á-bá do Consórcio',
+  description: 'Faça acontecer com a Multiplic Consórcios.',
+  alternates: {
+    canonical: path,
+  },
+  openGraph: {
+    title: 'O bê-á-bá do Consórcio',
+    description: 'Faça acontecer com a Multiplic Consórcios.',
+    url: path,
+    type: 'article',
+  },
+}
 
 export default function Page() {
-  return <GuidePageContent slug={slug} />
+  return <BeABaPage />
 }

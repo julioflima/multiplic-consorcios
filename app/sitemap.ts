@@ -21,6 +21,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 1,
     },
+    {
+      url: `${SITE_URL}/academy`,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   ]
 
   const guideRoutes: MetadataRoute.Sitemap = guideSlugs.map((slug) => ({

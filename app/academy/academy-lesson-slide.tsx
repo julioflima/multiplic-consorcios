@@ -1,0 +1,112 @@
+'use client'
+
+import { useCallback, useEffect, useMemo, useRef } from 'react'
+
+import type { AcademySlide as AcademySlideData } from './academy-data'
+import styles from './academy.module.css'
+
+interface AcademyLessonSlideProps {
+  slide: AcademySlideData
+  index: number
+  isActive: boolean
+  isNeighbor: boolean
+  muted: boolean
+}
+
+export function AcademyLessonSlide({
+  slide,
+  index,
+  isActive,
+  isNeighbor,
+  muted,
+}: AcademyLessonSlideProps) {
+  const frameRef = useRef<HTMLIFrameElement | null>(null)
+
+  const embedSrc = useMemo(() => {
+    const params = new URLSearchParams({
+      autoplay: '1',
+      mute: '1',
+      controls: '0',
+      rel: '0',
+      loop: '1',
+      playsinline: '1',
+      modestbranding: '1',
+      enablejsapi: '1',
+      playlist: slide.videoId ?? '',
+    })
+
+    return `https://www.youtube-nocookie.com/embed/${slide.videoId}?${params.toString()}`
+  }, [slide.videoId])
+
+  const sendCommand = useCallback((command: string) => {
+    frameRef.current?.contentWindow?.postMessage(
+      JSON.stringify({ event: 'command', func: command, args: [] }),
+      '*',
+    )
+  }, [])
+
+  useEffect(() => {
+    if (!isActive) return
+
+    const timer = window.setTimeout(() => {
+      sendCommand(muted ? 'mute' : 'unMute')
+      sendCommand('playVideo')
+    }, 320)
+
+    return () => window.clearTimeout(timer)
+  }, [isActive, muted, sendCommand])
+
+  useEffect(() => {
+    if (isActive) return
+    sendCommand('pauseVideo')
+  }, [isActive, sendCommand])
+
+  return (
+    <section
+      className={styles.slide}
+      data-index={index}
+      aria-label={`${slide.topicLabel} — ${slide.lesson?.title ?? ''}`}
+      style={{ ['--topic-accent' as string]: slide.topicAccent }}
+    >
+      <div className={styles.stage}>
+        <div className={styles.stageGlow} />
+
+        {isActive || isNeighbor ? (
+          <iframe
+            ref={frameRef}
+            className={styles.player}
+            src={isActive ? embedSrc : `${embedSrc}&autoplay=0`}
+            title={slide.lesson?.title ?? slide.topicLabel}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className={styles.poster}
+            src={`https://i.ytimg.com/vi/${slide.videoId}/hqdefault.jpg`}
+            alt=""
+            loading="lazy"
+          />
+        )}
+
+        <div className={styles.playerVeil} />
+
+        <div className={styles.slideBody}>
+          <span className={styles.slideTopic}>
+            {slide.topicLabel} · aula {slide.stepInTopic}/{slide.lessonsInTopic}
+          </span>
+          <h2 className={styles.slideTitle}>{slide.lesson?.title}</h2>
+          <p className={styles.slideSummary}>{slide.lesson?.summary}</p>
+
+          {slide.isLastOfTopic ? (
+            <span className={styles.nextTopicHint}>
+              Fim do tópico · a seguir: {slide.nextTopicLabel}
+            </span>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  )
+}

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-label="Comparativo de juros entre financiamento e consórcio">
+  <defs>
+    <linearGradient id="jr" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#ff2d6f"/>
+      <stop offset="1" stop-color="#ff8a3d"/>
+    </linearGradient>
+    <linearGradient id="jg" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#39ff88"/>
+    </linearGradient>
+    <filter id="jb" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+  </defs>
+  <rect width="800" height="500" fill="#000"/>
+  <g stroke="#ffffff" stroke-opacity="0.08">
+    <path d="M80 400H740M80 310H740M80 220H740M80 130H740"/>
+  </g>
+  <g filter="url(#jb)" opacity="0.6">
+    <rect x="150" y="90" width="150" height="310" rx="16" fill="url(#jr)"/>
+    <rect x="470" y="290" width="150" height="110" rx="16" fill="url(#jg)"/>
+  </g>
+  <rect x="150" y="90" width="150" height="310" rx="16" fill="url(#jr)"/>
+  <rect x="470" y="290" width="150" height="110" rx="16" fill="url(#jg)"/>
+  <path d="M60 400H760" stroke="#3ef0ff" stroke-width="4" stroke-linecap="round"/>
+  <g font-family="Manrope, Arial, sans-serif" text-anchor="middle">
+    <text x="225" y="70" fill="#ff8a3d" font-size="30" font-weight="800">+100% juros</text>
+    <text x="225" y="440" fill="#ffffff" font-size="24" font-weight="700" opacity="0.85">Financiamento</text>
+    <text x="545" y="265" fill="#39ff88" font-size="30" font-weight="800">só taxa</text>
+    <text x="545" y="440" fill="#ffffff" font-size="24" font-weight="700" opacity="0.85">Consórcio</text>
+  </g>
+</svg>

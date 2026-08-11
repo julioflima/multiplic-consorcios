@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-label="Porta fechada do financiamento com barreiras">
+  <defs>
+    <linearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff2d6f"/>
+      <stop offset="1" stop-color="#ff8a3d"/>
+    </linearGradient>
+    <filter id="db" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <rect width="800" height="500" fill="#000"/>
+  <g filter="url(#db)" opacity="0.5">
+    <rect x="300" y="90" width="200" height="330" rx="18" fill="none" stroke="url(#dg)" stroke-width="12"/>
+  </g>
+  <rect x="300" y="90" width="200" height="330" rx="18" fill="#080808" stroke="url(#dg)" stroke-width="6"/>
+  <circle cx="460" cy="260" r="12" fill="#ff8a3d"/>
+  <g stroke="url(#dg)" stroke-width="14" stroke-linecap="round">
+    <path d="M250 190h300M250 330h300"/>
+  </g>
+  <g fill="none" stroke="#ff2d6f" stroke-width="8" stroke-linecap="round">
+    <path d="M120 150l70 70M190 150l-70 70"/>
+    <path d="M610 300l70 70M680 300l-70 70"/>
+  </g>
+  <g font-family="Manrope, Arial, sans-serif" text-anchor="middle" font-weight="800" fill="#ffffff" opacity="0.75">
+    <text x="150" y="290" font-size="20">score</text>
+    <text x="645" y="260" font-size="20">entrada</text>
+  </g>
+</svg>

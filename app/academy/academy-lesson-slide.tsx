@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 
-import type { AcademySlide as AcademySlideData } from './academy-data'
+import type { AcademySlide } from './academy-data'
 import styles from './academy.module.css'
 
 interface AcademyLessonSlideProps {
-  slide: AcademySlideData
+  slide: AcademySlide
   index: number
   isActive: boolean
   isNeighbor: boolean
@@ -32,7 +32,7 @@ export function AcademyLessonSlide({
       playsinline: '1',
       modestbranding: '1',
       enablejsapi: '1',
-      playlist: slide.videoId ?? '',
+      playlist: slide.videoId,
     })
 
     return `https://www.youtube-nocookie.com/embed/${slide.videoId}?${params.toString()}`
@@ -65,7 +65,7 @@ export function AcademyLessonSlide({
     <section
       className={styles.slide}
       data-index={index}
-      aria-label={`${slide.topicLabel} — ${slide.lesson?.title ?? ''}`}
+      aria-label={`${slide.topicLabel} — ${slide.lesson.title}`}
       style={{ ['--topic-accent' as string]: slide.topicAccent }}
     >
       <div className={styles.stage}>
@@ -76,29 +76,24 @@ export function AcademyLessonSlide({
             ref={frameRef}
             className={styles.player}
             src={isActive ? embedSrc : `${embedSrc}&autoplay=0`}
-            title={slide.lesson?.title ?? slide.topicLabel}
+            title={slide.lesson.title}
             loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            className={styles.poster}
-            src={`https://i.ytimg.com/vi/${slide.videoId}/hqdefault.jpg`}
-            alt=""
-            loading="lazy"
-          />
+          <img className={styles.poster} src={slide.thumbnail} alt="" loading="lazy" />
         )}
 
         <div className={styles.playerVeil} />
 
         <div className={styles.slideBody}>
           <span className={styles.slideTopic}>
-            {slide.topicLabel} · aula {slide.stepInTopic}/{slide.lessonsInTopic}
+            {slide.topicLabel} · aula {slide.step}/{slide.lessonsInTopic}
           </span>
-          <h2 className={styles.slideTitle}>{slide.lesson?.title}</h2>
-          <p className={styles.slideSummary}>{slide.lesson?.summary}</p>
+          <h2 className={styles.slideTitle}>{slide.lesson.title}</h2>
+          <p className={styles.slideSummary}>{slide.lesson.summary}</p>
 
           {slide.isLastOfTopic ? (
             <span className={styles.nextTopicHint}>

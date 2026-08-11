@@ -11,8 +11,8 @@ type Step = 'landing' | 'contract' | 'success'
 
 const stats = [
   { value: 'R$ 0', label: 'de juros no consórcio' },
-  { value: '1%', label: 'do valor do bem pra você' },
-  { value: 'até 10k', label: 'por conversão' },
+  { value: '1%', label: 'da carta de crédito pra você' },
+  { value: '3x', label: 'parcelas iguais de comissão' },
 ]
 
 const commissionExamples = [
@@ -20,6 +20,21 @@ const commissionExamples = [
   { asset: 'Carro premium', credit: 'R$ 250 mil', commission: 'R$ 2.500' },
   { asset: 'Apartamento', credit: 'R$ 500 mil', commission: 'R$ 5.000' },
   { asset: 'Casa alto padrão', credit: 'R$ 1 milhão', commission: 'R$ 10.000' },
+]
+
+const commissionSteps = [
+  {
+    title: '1/3 da comissão',
+    copy: 'Após a confirmação do pagamento da 1ª parcela do consorciado e da adesão regular da cota.',
+  },
+  {
+    title: '1/3 da comissão',
+    copy: 'Após a confirmação do pagamento da 2ª parcela do consorciado.',
+  },
+  {
+    title: '1/3 da comissão',
+    copy: 'Após a confirmação do pagamento da 12ª parcela, com a cota ativa e regular.',
+  },
 ]
 
 const financingPains = [
@@ -67,7 +82,7 @@ const partnerCards = [
   },
   {
     title: 'Você recebe 1%',
-    copy: 'A comissão é 1% do valor do bem contratado pelo seu seguidor, podendo chegar a R$ 10 mil por conversão.',
+    copy: 'A remuneração é 1% do valor nominal inicial da carta de crédito contratada pelo seu seguidor, paga em 3 parcelas iguais.',
   },
   {
     title: 'Sem custo nenhum',
@@ -75,38 +90,40 @@ const partnerCards = [
   },
 ]
 
+const CONTRACT_PDF_URL = '/contratos/contrato-influenciadores-multiplic-2026.pdf'
+
 const clauses = [
   {
     title: '1. Partes',
-    copy: 'Contrato de parceria comercial entre a Multiplic Consórcios e o influenciador parceiro, para divulgação e indicação de interessados em consórcio.',
+    copy: 'Contrato de prestação de serviços de divulgação e indicação entre a Multiplic Corretora de Seguros LTDA (CNPJ 23.974.875/0001-90) e o influenciador parceiro.',
   },
   {
     title: '2. Objeto',
-    copy: 'O parceiro divulga a Multiplic Consórcios por meio de link, cupom ou materiais autorizados, direcionando sua audiência para simulação e contratação de consórcio.',
+    copy: 'Você divulga a Multiplic por link, cupom ou materiais aprovados e encaminha interessados aos canais oficiais. A contratação é feita entre o cliente e a administradora.',
   },
   {
-    title: '3. Comissão de 1%',
-    copy: 'A cada contratação validada, o parceiro recebe 1% do valor do bem (carta de crédito) indicado, limitado a R$ 10.000,00 por conversão, conforme a campanha vigente.',
+    title: '3. Remuneração de 1%',
+    copy: 'Você recebe 1% do valor nominal inicial da carta de crédito contratada pelo cliente indicado e atribuído a você.',
   },
   {
-    title: '4. Pagamento',
-    copy: 'A comissão é devida após a confirmação da contratação, validação dos dados do cliente indicado e cumprimento das condições comerciais vigentes.',
+    title: '4. Pagamento em 3 parcelas',
+    copy: 'A comissão é dividida em 3 parcelas iguais, pagas após o consorciado quitar a 1ª, a 2ª e a 12ª parcela do consórcio, com a cota regular.',
   },
   {
-    title: '5. Não conversão',
-    copy: 'Simulações, leads não convertidos, contratos cancelados ou propostas não efetivadas não geram direito automático à comissão.',
+    title: '5. Indicação rastreável',
+    copy: 'Só gera comissão a indicação registrada por link, cupom ou formulário oficial. Leads já existentes, duplicados ou fraudulentos não são remunerados.',
   },
   {
-    title: '6. Conduta e uso da marca',
-    copy: 'O parceiro não representa legalmente a Multiplic Consórcios, não pode prometer aprovação, garantir contemplação ou assumir obrigações em nome da empresa.',
+    title: '6. Limites de atuação',
+    copy: 'Você não vende, não negocia cotas, não recebe valores de clientes e não coleta documentos. Toda análise individual é feita pela equipe da Multiplic.',
   },
   {
-    title: '7. Vigência e encerramento',
-    copy: 'A parceria é por prazo indeterminado e pode ser encerrada por qualquer das partes, especialmente em caso de divulgação enganosa, fraude ou uso indevido da marca.',
+    title: '7. Publicidade responsável',
+    copy: 'Conteúdo aprovado previamente, com identificação de publicidade (#publi) e sem promessa de contemplação, lucro ou rentabilidade garantidos.',
   },
   {
-    title: '8. Aceite eletrônico',
-    copy: 'Ao tocar em "Assinar contrato", o parceiro declara que leu, compreendeu e aceitou as condições desta parceria, com registro eletrônico de data e hora.',
+    title: '8. Vigência e aceite',
+    copy: 'Prazo indeterminado, rescindível por qualquer parte com aviso de 30 dias. Ao tocar em "Assinar contrato", você declara ter lido e aceito o contrato completo.',
   },
 ]
 
@@ -160,12 +177,12 @@ export function InfluencerExperience() {
           />
           <h1 className={styles.title}>
             Ajude seu público a sair do aluguel{' '}
-            <span className={styles.neon}>e ganhe até R$ 10 mil por conversão.</span>
+            <span className={styles.neon}>e ganhe 1% de cada carta contratada.</span>
           </h1>
           <p className={styles.lead}>
             Consórcio é o jeito sem juros de conquistar casa ou carro. Você indica,
-            a Multiplic atende e você recebe 1% do valor do bem — até R$ 10 mil
-            por contratação.
+            a Multiplic atende e você recebe 1% do valor da carta de crédito
+            contratada.
           </p>
 
           <div className={styles.statRow}>
@@ -247,7 +264,7 @@ export function InfluencerExperience() {
             Sua audiência confia em você. Isso vale muito.
           </h2>
           <Image
-            alt="Celular mostrando comissão de até dez mil reais por conversão"
+            alt="Comissão de 1% da carta de crédito paga em três parcelas"
             className={styles.sectionImage}
             height={500}
             src="/influencer/ganhos.svg"
@@ -267,18 +284,30 @@ export function InfluencerExperience() {
         <section className={styles.section}>
           <span className={styles.eyebrow}>A regra do 1%</span>
           <h2 className={styles.sectionTitle}>
-            Você ganha 1% do valor do bem. Simples assim.
+            Você ganha 1% da carta de crédito. Simples assim.
           </h2>
           <p className={styles.lead}>
-            Nada de tabela confusa: a comissão é 1% do valor da carta de crédito
-            contratada pelo seu seguidor, limitada a R$ 10 mil por conversão.
-            Quanto maior o sonho que você ajuda a realizar, maior o seu ganho.
+            Nada de tabela confusa: a remuneração total é 1% do valor nominal
+            inicial da carta de crédito contratada pelo seu seguidor. Quanto
+            maior o sonho que você ajuda a realizar, maior o seu ganho.
           </p>
 
           <div className={styles.moneyBox}>
-            <span className={styles.eyebrow}>Comissão por conversão</span>
-            <p className={styles.moneyValue}>1% do bem</p>
-            <p className={styles.moneyNote}>até o teto de R$ 10.000 por contratação validada</p>
+            <span className={styles.eyebrow}>Remuneração total</span>
+            <p className={styles.moneyValue}>1% da carta</p>
+            <p className={styles.moneyNote}>
+              dividida em 3 parcelas iguais, conforme a Cláusula 9 do contrato
+            </p>
+          </div>
+
+          <div className={styles.cards}>
+            {commissionSteps.map((item, index) => (
+              <article className={styles.card} key={item.copy}>
+                <span className={styles.cardIndex}>{index + 1}</span>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </article>
+            ))}
           </div>
 
           <table className={styles.table}>
@@ -301,8 +330,11 @@ export function InfluencerExperience() {
           </table>
 
           <p className={styles.footnote}>
-            A comissão é paga após a contratação ser concluída e validada.
-            Simulações, leads não convertidos e contratos cancelados não geram
+            O percentual incide apenas sobre o valor nominal inicial da carta,
+            sem incidir sobre taxa de administração, fundo de reserva, seguro ou
+            outros encargos. Só geram remuneração indicações rastreáveis e
+            operações válidas e regulares: leads já existentes na base,
+            cadastros duplicados, fraudulentos ou cotas canceladas não geram
             comissão.
           </p>
         </section>
@@ -337,10 +369,10 @@ export function InfluencerExperience() {
           <div className={styles.contractBody}>
             <div className={styles.contractInner}>
               <h3 className={styles.contractHeading}>
-                Contrato de Parceria Comercial
+                Contrato de Prestação de Serviços de Divulgação e Indicação
               </h3>
               <p className={styles.contractMeta}>
-                Multiplic Consórcios · versão influenciadores 2026
+                Multiplic Corretora de Seguros LTDA · Programa de Influenciadores 2026
               </p>
 
               {clauses.map((clause) => (
@@ -352,7 +384,7 @@ export function InfluencerExperience() {
 
               <Link
                 className={styles.pdfLink}
-                href="/api/contracts/affiliate"
+                href={CONTRACT_PDF_URL}
                 target="_blank"
               >
                 Abrir contrato completo em PDF
@@ -400,7 +432,7 @@ export function InfluencerExperience() {
               <div className={styles.successPills}>
                 <span className={styles.pill}>✓ Contrato assinado</span>
                 <span className={styles.pill}>✓ Link e cupom exclusivos a caminho</span>
-                <span className={styles.pill}>✓ 1% do valor do bem, até R$ 10 mil</span>
+                <span className={styles.pill}>✓ 1% da carta em 3 parcelas iguais</span>
               </div>
 
               <Link className={styles.ctaGhost} href="/">

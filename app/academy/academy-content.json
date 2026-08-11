@@ -1,0 +1,195 @@
+{
+  "page": {
+    "eyebrow": "Formação em consórcio",
+    "title": "Academy",
+    "subtitle": "Aprenda consórcio em aulas de um minuto",
+    "description": "A plataforma de treinamento da Multiplic reúne, em vídeos curtos, tudo o que você precisa para dominar consórcio de ponta a ponta: da mecânica do grupo às estratégias de alavancagem usadas por quem constrói patrimônio. Escolha um tópico, toque em uma aula e siga assistindo — a trilha nunca acaba.",
+    "hint": "Arraste as trilhas para o lado · toque em uma aula para assistir em tela cheia",
+    "backLabel": "Voltar ao site",
+    "backHref": "/",
+    "logo": "/brand/logo-horizontal-branco.png",
+    "logoAlt": "Multiplic Consórcios"
+  },
+  "topics": [
+    {
+      "slug": "consorcio",
+      "label": "Consórcio",
+      "subtitle": "O alicerce de tudo",
+      "description": "A mecânica do autofinanciamento coletivo: carta de crédito, fundo comum, taxa de administração e por que consórcio não é financiamento.",
+      "accent": "#3f79f2",
+      "lessons": [
+        {
+          "title": "O que é consórcio de verdade",
+          "summary": "A lógica do autofinanciamento coletivo em 60 segundos.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Carta de crédito x financiamento",
+          "summary": "Onde o seu dinheiro vai em cada modelo.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Taxa de administração sem mistério",
+          "summary": "Como ler o custo real do seu plano.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Fundo de reserva e seguro",
+          "summary": "O que protege o grupo e o seu bolso.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Assembleia: como funciona",
+          "summary": "O encontro mensal que decide as contemplações.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Consórcio é para quem?",
+          "summary": "O perfil que mais ganha com o modelo.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        }
+      ]
+    },
+    {
+      "slug": "alavancagem",
+      "label": "Alavancagem",
+      "subtitle": "Multiplicar patrimônio",
+      "description": "Estratégias de lance, uso do crédito para gerar renda e como transformar parcela em ativo que se paga sozinho.",
+      "accent": "#c99435",
+      "lessons": [
+        {
+          "title": "Alavancagem patrimonial na prática",
+          "summary": "Transformando parcela em ativo que se paga.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Lance embutido, livre e fixo",
+          "summary": "Qual usar em cada objetivo.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Escada de cartas de crédito",
+          "summary": "Como escalar contemplações ao longo do tempo.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Erros que travam a alavancagem",
+          "summary": "O que evitar antes da primeira contemplação.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Consórcio como reserva programada",
+          "summary": "Disciplina financeira com destino certo.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        }
+      ]
+    },
+    {
+      "slug": "grupo-fixo",
+      "label": "Grupo Fixo",
+      "subtitle": "Previsibilidade total",
+      "description": "Como funciona um grupo fixo: prazo definido, número de cotas, assembleias e mais controle sobre a contemplação.",
+      "accent": "#4bb98b",
+      "lessons": [
+        {
+          "title": "O que é um grupo fixo",
+          "summary": "Estrutura, prazo e número de cotas.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Assembleias e contemplação",
+          "summary": "Sorteio e lance no dia a dia do grupo.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Grupo fixo x grupo aberto",
+          "summary": "A vantagem de saber a data do fim.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Quando o grupo fixo compensa",
+          "summary": "Cenários em que a previsibilidade vale mais.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Transferência de cota",
+          "summary": "O que fazer se precisar sair do grupo.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        }
+      ]
+    },
+    {
+      "slug": "imovel",
+      "label": "Imóvel",
+      "subtitle": "Do primeiro lar ao portfólio",
+      "description": "Compra, construção, reforma e permuta com carta de crédito imobiliária — e como o aluguel pode sustentar a cota.",
+      "accent": "#8b6ef0",
+      "lessons": [
+        {
+          "title": "Comprar imóvel com consórcio",
+          "summary": "Passo a passo da carta até a escritura.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Construir e reformar",
+          "summary": "Usando o crédito em obra no seu terreno.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Renda de aluguel pagando a cota",
+          "summary": "A conta que faz o imóvel se sustentar.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Documentação e garantias",
+          "summary": "O que a administradora analisa na liberação.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Terreno + construção",
+          "summary": "Usando uma carta para as duas etapas.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Primeiro imóvel sem entrada",
+          "summary": "Planejamento para sair do aluguel.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        }
+      ]
+    },
+    {
+      "slug": "veiculo",
+      "label": "Veículo",
+      "subtitle": "Carro, moto e pesados",
+      "description": "Como escolher o crédito para veículo, trocar com inteligência e usar frota como ferramenta de trabalho.",
+      "accent": "#e2574c",
+      "lessons": [
+        {
+          "title": "Carro novo ou seminovo",
+          "summary": "Onde a carta de crédito rende mais.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Moto como primeira conquista",
+          "summary": "Planos curtos e parcelas baixas.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Pesados e frota",
+          "summary": "Crédito que vira máquina de trabalho.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Trocar de carro a cada ciclo",
+          "summary": "Usando contemplações para renovar sem perder valor.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        },
+        {
+          "title": "Veículo para trabalhar em apps",
+          "summary": "Quando o carro precisa se pagar.",
+          "url": "https://youtube.com/shorts/jwD9BE8swk8"
+        }
+      ]
+    }
+  ]
+}

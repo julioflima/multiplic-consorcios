@@ -287,6 +287,26 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+/* ---------- Rodapé ---------- */
+
+.footer {
+  background: #050505 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+  padding-bottom: 120px !important;
+}
+
+.footer :global(.footer-top) {
+  grid-template-columns: 1fr;
+  gap: 32px;
+  padding-bottom: 32px;
+}
+
+@media (min-width: 900px) {
+  .footer :global(.footer-top) {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  }
+}
+
 /* ---------- CTAs ---------- */
 
 .ctaBar {

@@ -400,14 +400,17 @@
 }
 
 /*
- * O iframe é maior que o palco e fica centralizado: a faixa de título/ações
- * e o rodapé do YouTube ficam fora da área visível, sem cortar o vídeo.
+ * O iframe é servido em 16:9 (player clássico, sem a UI de Shorts) e fica
+ * centralizado com largura 340% do palco: o vídeo vertical dentro dele passa a
+ * preencher a área visível e todos os controles nativos ficam fora do recorte.
  */
 .player {
   inset: auto;
   top: 50%;
   left: 50%;
-  height: 136%;
+  width: 340%;
+  height: auto;
+  aspect-ratio: 16 / 9;
   transform: translate(-50%, -50%);
 }
 
@@ -506,16 +509,16 @@
 .topBarRow {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: space-between;
 }
 
 .topIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -523,16 +526,25 @@
   cursor: pointer;
   pointer-events: auto;
   filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.6));
-  transition: opacity 0.2s ease;
+  transition: background 0.18s ease;
 }
 
-.topIcon:hover {
-  opacity: 0.75;
+.topIcon:hover,
+.topIcon:focus-visible {
+  background: rgba(0, 0, 0, 0.42);
+  outline: none;
+}
+
+.topIcon:active {
+  background: rgba(0, 0, 0, 0.55);
 }
 
 .tapLayer {
   position: absolute;
-  inset: 0;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 84px;
   z-index: 5;
   display: flex;
   pointer-events: none;
@@ -553,39 +565,61 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.tapLabel {
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
-}
-
 .tapPrev {
-  flex: 0 0 28%;
+  flex: 0 0 33.33%;
   background: rgba(255, 64, 64, 0.22);
 }
 
 .tapCenter {
-  flex: 1 1 auto;
+  flex: 0 0 33.33%;
   display: flex;
   flex-direction: column;
 }
 
 .tapSound {
-  flex: 0 0 26%;
-  align-items: flex-end;
-  padding-bottom: 6px;
-  background: rgba(64, 132, 255, 0.2);
+  flex: 0 0 40%;
+  background: rgba(64, 132, 255, 0.28);
 }
 
-.tapFree {
+.tapPlay {
   flex: 1 1 auto;
-  pointer-events: none;
+  background: rgba(255, 205, 64, 0.22);
 }
 
 .tapNext {
-  flex: 0 0 28%;
+  flex: 0 0 33.34%;
   background: rgba(64, 220, 120, 0.22);
 }
+
+.playBadge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.42);
+  color: #fff;
+  pointer-events: none;
+  animation: playBadgeIn 0.18s ease-out;
+}
+
+@keyframes playBadgeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 
 .progressRow {
   display: flex;

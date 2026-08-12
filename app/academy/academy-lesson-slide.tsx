@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { AcademySlide } from './academy-data'
 import styles from './academy.module.css'
@@ -27,6 +27,7 @@ export function AcademyLessonSlide({
   onToggleSound,
 }: AcademyLessonSlideProps) {
   const frameRef = useRef<HTMLIFrameElement | null>(null)
+  const [paused, setPaused] = useState(false)
 
   const embedSrc = useMemo(() => {
     const params = new URLSearchParams({
@@ -34,28 +35,85 @@ export function AcademyLessonSlide({
       mute: '1',
       controls: '0',
       rel: '0',
-      loop: '1',
       playsinline: '1',
       modestbranding: '1',
       enablejsapi: '1',
       iv_load_policy: '3',
       disablekb: '1',
       fs: '0',
-      playlist: slide.videoId,
     })
 
     return `https://www.youtube-nocookie.com/embed/${slide.videoId}?${params.toString()}`
   }, [slide.videoId])
 
-  const sendCommand = useCallback((command: string) => {
-    frameRef.current?.contentWindow?.postMessage(
-      JSON.stringify({ event: 'command', func: command, args: [] }),
-      '*',
-    )
-  }, [])
+  const sendCommand = useCallback(
+    (command: string, args: (string | number)[] = []) => {
+      frameRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: 'command', func: command, args }),
+        '*',
+      )
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!isActive) return
+
+    const frame = frameRef.current
+    if (!frame) return
+
+    const subscribe = () => {
+      frame.contentWindow?.postMessage(
+        JSON.stringify({ event: 'listening', id: `slide-${index}` }),
+        '*',
+      )
+    }
+
+    const interval = window.setInterval(subscribe, 600)
+    subscribe()
+
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.origin.includes('youtube')) return
+      if (event.source !== frame.contentWindow) return
+      if (typeof event.data !== 'string') return
+
+      try {
+        const payload = JSON.parse(event.data)
+        if (payload?.event !== 'infoDelivery') return
+
+        const state = payload?.info?.playerState
+        if (state === 0) {
+          sendCommand('seekTo', [0, 1])
+          sendCommand('playVideo')
+        }
+        if (state === 1 || state === 2) {
+          setPaused(state === 2)
+        }
+      } catch {
+        // mensagens que não são JSON do player são ignoradas
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+
+    return () => {
+      window.clearInterval(interval)
+      window.removeEventListener('message', handleMessage)
+    }
+  }, [index, isActive, sendCommand])
+
+  const handleTogglePlay = useCallback(() => {
+    setPaused((current) => {
+      sendCommand(current ? 'playVideo' : 'pauseVideo')
+      return !current
+    })
+  }, [sendCommand])
+
+  useEffect(() => {
+    if (!isActive) {
+      const reset = window.setTimeout(() => setPaused(false), 0)
+      return () => window.clearTimeout(reset)
+    }
 
     const timer = window.setTimeout(() => {
       sendCommand(muted ? 'mute' : 'unMute')
@@ -107,29 +165,38 @@ export function AcademyLessonSlide({
             className={`${styles.tapZone} ${styles.tapPrev}`}
             onClick={onPrevious}
             aria-label="Aula anterior"
-          >
-            <span className={styles.tapLabel}>VOLTAR</span>
-          </button>
+          />
+
           <div className={styles.tapCenter}>
             <button
               type="button"
               className={`${styles.tapZone} ${styles.tapSound}`}
               onClick={onToggleSound}
               aria-label={muted ? 'Ativar som' : 'Desativar som'}
-            >
-              <span className={styles.tapLabel}>SOM</span>
-            </button>
-            <div className={styles.tapFree} />
+            />
+            <button
+              type="button"
+              className={`${styles.tapZone} ${styles.tapPlay}`}
+              onClick={handleTogglePlay}
+              aria-label={paused ? 'Reproduzir' : 'Pausar'}
+            />
           </div>
+
           <button
             type="button"
             className={`${styles.tapZone} ${styles.tapNext}`}
             onClick={onNext}
             aria-label="Próxima aula"
-          >
-            <span className={styles.tapLabel}>PASSAR</span>
-          </button>
+          />
         </div>
+
+        {paused ? (
+          <div className={styles.playBadge} aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 24 24">
+              <path d="M8.4 5.6l10.2 6.05a.4.4 0 010 .7L8.4 18.4a.4.4 0 01-.6-.35V5.95a.4.4 0 01.6-.35z" fill="currentColor" />
+            </svg>
+          </div>
+        ) : null}
 
         <div className={styles.slideBody}>
           <span className={styles.slideTopic}>

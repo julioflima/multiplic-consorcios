@@ -1,36 +1,32 @@
-'use client'
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { SiteFooter } from '@/components/site-footer'
+import { SiteFooter } from "@/components/site-footer";
 
-import {
-  ACADEMY_PAGE,
-  ACADEMY_SLIDES,
-  findSlideIndex,
-} from './academy-data'
-import { AcademyBrowse } from './academy-browse'
-import { AcademyLessonSlide } from './academy-lesson-slide'
-import styles from './academy.module.css'
+import { ACADEMY_PAGE, ACADEMY_SLIDES, findSlideIndex } from "./academy-data";
+import { AcademyBrowse } from "./academy-browse";
+import { AcademyLessonSlide } from "./academy-lesson-slide";
+import styles from "./academy.module.css";
 
 /** Cópias da trilha para simular o feed vertical infinito. */
-const LOOP_COPIES = 3
+const LOOP_COPIES = 3;
 
-const BASE_LENGTH = ACADEMY_SLIDES.length
+const BASE_LENGTH = ACADEMY_SLIDES.length;
 
 export function AcademyExperience() {
-  const [playerOpen, setPlayerOpen] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(BASE_LENGTH)
-  const [muted, setMuted] = useState(true)
+  const [playerOpen, setPlayerOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(BASE_LENGTH);
+  const [muted, setMuted] = useState(true);
 
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const pendingIndexRef = useRef<number | null>(null)
-  const activeIndexRef = useRef(activeIndex)
-  const idleTimerRef = useRef<number | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const pendingIndexRef = useRef<number | null>(null);
+  const activeIndexRef = useRef(activeIndex);
+  const idleTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    activeIndexRef.current = activeIndex
-  }, [activeIndex])
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
 
   const loopSlides = useMemo(
     () =>
@@ -41,150 +37,150 @@ export function AcademyExperience() {
         })),
       ),
     [],
-  )
+  );
 
-  const activeSlide = loopSlides[activeIndex] ?? loopSlides[BASE_LENGTH]
+  const activeSlide = loopSlides[activeIndex] ?? loopSlides[BASE_LENGTH];
 
   const scrollToIndex = useCallback(
-    (index: number, behavior: ScrollBehavior = 'smooth') => {
+    (index: number, behavior: ScrollBehavior = "smooth") => {
       const target = containerRef.current?.children[index] as
         | HTMLElement
-        | undefined
-      target?.scrollIntoView({ behavior, block: 'start' })
+        | undefined;
+      target?.scrollIntoView({ behavior, block: "start" });
     },
     [],
-  )
+  );
 
   const goToIndex = useCallback(
     (index: number) => {
-      const clamped = Math.max(0, Math.min(loopSlides.length - 1, index))
-      setActiveIndex(clamped)
-      scrollToIndex(clamped)
+      const clamped = Math.max(0, Math.min(loopSlides.length - 1, index));
+      setActiveIndex(clamped);
+      scrollToIndex(clamped);
     },
     [loopSlides.length, scrollToIndex],
-  )
+  );
 
   const handleOpenLesson = useCallback(
     (topicSlug: string, lessonIndex: number) => {
-      const offset = findSlideIndex(topicSlug, lessonIndex)
-      if (offset < 0) return
+      const offset = findSlideIndex(topicSlug, lessonIndex);
+      if (offset < 0) return;
 
-      pendingIndexRef.current = BASE_LENGTH + offset
-      setActiveIndex(BASE_LENGTH + offset)
-      setPlayerOpen(true)
+      pendingIndexRef.current = BASE_LENGTH + offset;
+      setActiveIndex(BASE_LENGTH + offset);
+      setPlayerOpen(true);
     },
     [],
-  )
+  );
 
   const handleClosePlayer = useCallback(() => {
-    setPlayerOpen(false)
-    window.history.replaceState(null, '', '/academy')
-  }, [])
+    setPlayerOpen(false);
+    window.history.replaceState(null, "", "/academy");
+  }, []);
 
   const handleToggleMuted = useCallback(() => {
-    setMuted((current) => !current)
-  }, [])
+    setMuted((current) => !current);
+  }, []);
 
   const handlePrevious = useCallback(() => {
-    goToIndex(activeIndexRef.current - 1)
-  }, [goToIndex])
+    goToIndex(activeIndexRef.current - 1);
+  }, [goToIndex]);
 
   const handleNext = useCallback(() => {
-    goToIndex(activeIndexRef.current + 1)
-  }, [goToIndex])
+    goToIndex(activeIndexRef.current + 1);
+  }, [goToIndex]);
 
   /** Reposiciona o scroll na cópia central mantendo o loop imperceptível. */
   const recenter = useCallback(() => {
-    const container = containerRef.current
-    if (!container) return
+    const container = containerRef.current;
+    if (!container) return;
 
-    const slideHeight = container.clientHeight
-    const index = activeIndexRef.current
+    const slideHeight = container.clientHeight;
+    const index = activeIndexRef.current;
 
     if (index < BASE_LENGTH) {
-      container.scrollTop += BASE_LENGTH * slideHeight
-      setActiveIndex(index + BASE_LENGTH)
-      return
+      container.scrollTop += BASE_LENGTH * slideHeight;
+      setActiveIndex(index + BASE_LENGTH);
+      return;
     }
 
     if (index >= BASE_LENGTH * 2) {
-      container.scrollTop -= BASE_LENGTH * slideHeight
-      setActiveIndex(index - BASE_LENGTH)
+      container.scrollTop -= BASE_LENGTH * slideHeight;
+      setActiveIndex(index - BASE_LENGTH);
     }
-  }, [])
+  }, []);
 
   const handleFeedScroll = useCallback(() => {
-    if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current)
-    idleTimerRef.current = window.setTimeout(recenter, 220)
-  }, [recenter])
+    if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = window.setTimeout(recenter, 220);
+  }, [recenter]);
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!playerOpen || !container) return
+    const container = containerRef.current;
+    if (!playerOpen || !container) return;
 
-    scrollToIndex(pendingIndexRef.current ?? activeIndexRef.current, 'auto')
-    pendingIndexRef.current = null
+    scrollToIndex(pendingIndexRef.current ?? activeIndexRef.current, "auto");
+    pendingIndexRef.current = null;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
+          if (!entry.isIntersecting) return;
           const index = Number(
-            (entry.target as HTMLElement).dataset.index ?? '0',
-          )
-          setActiveIndex(index)
-        })
+            (entry.target as HTMLElement).dataset.index ?? "0",
+          );
+          setActiveIndex(index);
+        });
       },
       { root: container, threshold: 0.6 },
-    )
+    );
 
-    Array.from(container.children).forEach((child) => observer.observe(child))
+    Array.from(container.children).forEach((child) => observer.observe(child));
 
-    return () => observer.disconnect()
-  }, [playerOpen, scrollToIndex])
+    return () => observer.disconnect();
+  }, [playerOpen, scrollToIndex]);
 
   useEffect(() => {
-    if (!playerOpen) return
+    if (!playerOpen) return;
 
-    document.body.style.overflow = 'hidden'
+    document.body.style.overflow = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowDown' || event.key === 'PageDown') {
-        event.preventDefault()
-        handleNext()
-        return
+      if (event.key === "ArrowDown" || event.key === "PageDown") {
+        event.preventDefault();
+        handleNext();
+        return;
       }
 
-      if (event.key === 'ArrowUp' || event.key === 'PageUp') {
-        event.preventDefault()
-        handlePrevious()
-        return
+      if (event.key === "ArrowUp" || event.key === "PageUp") {
+        event.preventDefault();
+        handlePrevious();
+        return;
       }
 
-      if (event.key === 'Escape') {
-        handleClosePlayer()
+      if (event.key === "Escape") {
+        handleClosePlayer();
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = ''
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [handleClosePlayer, handleNext, handlePrevious, playerOpen])
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleClosePlayer, handleNext, handlePrevious, playerOpen]);
 
   useEffect(() => {
-    if (!playerOpen || !activeSlide) return
-    window.history.replaceState(null, '', `/academy#${activeSlide.topicSlug}`)
-  }, [activeSlide, playerOpen])
+    if (!playerOpen || !activeSlide) return;
+    window.history.replaceState(null, "", `/academy#${activeSlide.topicSlug}`);
+  }, [activeSlide, playerOpen]);
 
   useEffect(
     () => () => {
-      if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current)
+      if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
     },
     [],
-  )
+  );
 
   return (
     <main className={styles.shell}>
@@ -193,7 +189,7 @@ export function AcademyExperience() {
       {playerOpen ? (
         <div
           className={styles.playerOverlay}
-          style={{ ['--topic-accent' as string]: activeSlide.topicAccent }}
+          style={{ ["--topic-accent" as string]: activeSlide.topicAccent }}
           role="dialog"
           aria-modal="true"
           aria-label={`${ACADEMY_PAGE.title} — player`}
@@ -215,13 +211,13 @@ export function AcademyExperience() {
                       styles.progressSegment,
                       segment < activeSlide.step - 1
                         ? styles.progressSegmentDone
-                        : '',
+                        : "",
                       segment === activeSlide.step - 1
                         ? styles.progressSegmentActive
-                        : '',
+                        : "",
                     ]
                       .filter(Boolean)
-                      .join(' ')}
+                      .join(" ")}
                   />
                 ),
               )}
@@ -230,14 +226,35 @@ export function AcademyExperience() {
             <div className={styles.topBarRow}>
               <button
                 type="button"
-                className={styles.topIcon}
+                className={`${styles.topIcon} ${styles.topBack}`}
+                onClick={handleClosePlayer}
+                aria-label="Voltar"
+              >
+                <svg
+                  width="30"
+                  height="30"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 4.5L7.5 12l7.5 7.5" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                className={`${styles.topIcon} ${styles.topIconSound}`}
                 onClick={handleToggleMuted}
-                aria-label={muted ? 'Ativar som' : 'Desativar som'}
+                aria-label={muted ? "Ativar som" : "Desativar som"}
               >
                 {muted ? (
                   <svg
-                    width="28"
-                    height="28"
+                    width="24"
+                    height="24"
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                   >
@@ -269,8 +286,8 @@ export function AcademyExperience() {
                   </svg>
                 ) : (
                   <svg
-                    width="28"
-                    height="28"
+                    width="24"
+                    height="24"
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                   >
@@ -287,26 +304,6 @@ export function AcademyExperience() {
                     />
                   </svg>
                 )}
-              </button>
-
-              <button
-                type="button"
-                className={styles.topIcon}
-                onClick={handleClosePlayer}
-                aria-label="Fechar player"
-              >
-                <svg
-                  width="26"
-                  height="26"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                >
-                  <path d="M6 6l12 12M18 6L6 18" />
-                </svg>
               </button>
             </div>
           </div>
@@ -330,11 +327,10 @@ export function AcademyExperience() {
               />
             ))}
           </div>
-
         </div>
       ) : null}
 
       <SiteFooter className={styles.footer} />
     </main>
-  )
+  );
 }

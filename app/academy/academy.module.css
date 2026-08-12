@@ -601,11 +601,11 @@
 }
 
 .badge {
-  display: flex;
+  display: hidden;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(83, 78, 78, 0.55);
+  background: rgba(0, 0, 0, 0.45);
   color: #fff;
   animation: badgeIn 0.16s ease-out;
 }
@@ -616,10 +616,9 @@
 }
 
 .badgePlay {
-  top: 100px;
-  position: absolute;
-  width: 54px;
-  height: 54px;
+  width: 68px;
+  height: 68px;
+  padding-left: 4px;
 }
 
 @keyframes badgeIn {

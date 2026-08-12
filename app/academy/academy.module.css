@@ -399,6 +399,18 @@
   border: 0;
 }
 
+/*
+ * O iframe é maior que o palco e fica centralizado: a faixa de título/ações
+ * e o rodapé do YouTube ficam fora da área visível, sem cortar o vídeo.
+ */
+.player {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  height: 136%;
+  transform: translate(-50%, -50%);
+}
+
 .poster {
   object-fit: cover;
   transform: scale(1.32);
@@ -423,6 +435,7 @@
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 5;
   padding: 0 20px 34px;
   pointer-events: none;
 }
@@ -481,51 +494,104 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 5;
+  z-index: 7;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 16px 22px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent);
+  gap: 8px;
+  padding: 8px 12px 22px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.62), transparent);
+  pointer-events: none;
 }
 
 .topBarRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 10px;
 }
 
-.playerTopicName {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-.iconButton {
+.topIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 auto;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(0, 0, 0, 0.4);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: #fff;
   cursor: pointer;
-  transition: background 0.2s ease;
+  pointer-events: auto;
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.6));
+  transition: opacity 0.2s ease;
 }
 
-.iconButton:hover {
-  background: rgba(255, 255, 255, 0.16);
+.topIcon:hover {
+  opacity: 0.75;
+}
+
+.tapLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  pointer-events: none;
+}
+
+.tapZone {
+  position: relative;
+  pointer-events: auto;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  color: #fff;
+  font: 700 11px/1 var(--font-sans, system-ui, sans-serif);
+  letter-spacing: 0.16em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tapLabel {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.tapPrev {
+  flex: 0 0 28%;
+  background: rgba(255, 64, 64, 0.22);
+}
+
+.tapCenter {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.tapSound {
+  flex: 0 0 26%;
+  align-items: flex-end;
+  padding-bottom: 6px;
+  background: rgba(64, 132, 255, 0.2);
+}
+
+.tapFree {
+  flex: 1 1 auto;
+  pointer-events: none;
+}
+
+.tapNext {
+  flex: 0 0 28%;
+  background: rgba(64, 220, 120, 0.22);
 }
 
 .progressRow {
   display: flex;
-  gap: 5px;
-  flex: 1 1 auto;
+  gap: 4px;
+  flex: 0 0 auto;
+  pointer-events: none;
 }
 
 .progressSegment {
@@ -544,48 +610,6 @@
   background: var(--topic-accent);
 }
 
-.topicRail {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 2px;
-}
-
-.topicRail::-webkit-scrollbar {
-  display: none;
-}
-
-.railChip {
-  flex: 0 0 auto;
-  padding: 7px 15px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(0, 0, 0, 0.42);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
-
-.railChipActive {
-  color: #06121f;
-  background: #fff;
-  border-color: #fff;
-}
-
-.sideControls {
-  position: absolute;
-  right: 14px;
-  bottom: 30px;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .card,
   .cardThumb {
@@ -599,7 +623,7 @@
   }
 
   .slideBody {
-    padding: 0 24px 40px;
+    padding: 0 66px 40px 24px;
   }
 }
 

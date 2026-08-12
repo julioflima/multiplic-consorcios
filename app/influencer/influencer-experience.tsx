@@ -10,6 +10,21 @@ import { Confetti } from './confetti'
 import styles from './influencer.module.css'
 
 type Step = 'landing' | 'contract' | 'success'
+type ContactKind = 'whatsapp' | 'email'
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+function formatWhatsapp(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11)
+
+  if (digits.length <= 2) return digits
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  }
+
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+}
 
 const stats = [
   { value: 'R$ 0', label: 'de juros no consórcio' },
@@ -130,24 +145,78 @@ const clauses = [
   },
 ]
 
-export function InfluencerExperience() {
+export function InfluencerExperience({
+  prefilledEmail = '',
+}: {
+  prefilledEmail?: string
+}) {
+  const hasPrefilledEmail = EMAIL_PATTERN.test(prefilledEmail)
+
   const [step, setStep] = useState<Step>('landing')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [contactKind, setContactKind] = useState<ContactKind>('whatsapp')
+  const [contact, setContact] = useState('')
+  const [contactError, setContactError] = useState('')
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
+
+  const contactDigits = contact.replace(/\D/g, '')
+  const isContactValid = hasPrefilledEmail
+    ? true
+    : contactKind === 'email'
+      ? EMAIL_PATTERN.test(contact.trim())
+      : contactDigits.length === 11
+
+  function handleContactKind(kind: ContactKind) {
+    setContactKind(kind)
+    setContact('')
+    setContactError('')
+  }
+
+  function handleContactChange(value: string) {
+    setContact(contactKind === 'whatsapp' ? formatWhatsapp(value) : value)
+    if (contactError) setContactError('')
+  }
+
+  function handleStartSigning() {
+    if (hasPrefilledEmail) {
+      void handleSignContract()
+      return
+    }
+
+    setContactError('')
+    setIsContactModalOpen(true)
+  }
 
   async function handleSignContract() {
+    if (!isContactValid) {
+      setContactError(
+        contactKind === 'email'
+          ? 'Informe um e-mail válido para receber o contrato.'
+          : 'Informe um WhatsApp válido com DDD (11 dígitos).',
+      )
+      return
+    }
+
     setIsSubmitting(true)
+
+    const payload = hasPrefilledEmail
+      ? { contactKind: 'email' as const, contact: prefilledEmail.trim() }
+      : contactKind === 'email'
+        ? { contactKind, contact: contact.trim() }
+        : { contactKind, contact: contactDigits }
 
     try {
       await fetch('/api/influencer/parceria', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ signedAt: new Date().toISOString() }),
+        body: JSON.stringify({ ...payload, signedAt: new Date().toISOString() }),
       })
     } catch {
       // A confirmação continua para o parceiro mesmo se o registro falhar.
     }
 
     setIsSubmitting(false)
+    setIsContactModalOpen(false)
     setStep('success')
   }
 
@@ -394,6 +463,14 @@ export function InfluencerExperience() {
               >
                 Abrir contrato completo em PDF
               </Link>
+
+              {hasPrefilledEmail ? (
+                <p className={styles.contactConfirm}>
+                  Vamos enviar a via assinada para{' '}
+                  <strong className={styles.neon}>{prefilledEmail.trim()}</strong>.
+                </p>
+              ) : null}
+
             </div>
           </div>
 
@@ -401,7 +478,7 @@ export function InfluencerExperience() {
             <button
               className={styles.signButton}
               disabled={isSubmitting}
-              onClick={handleSignContract}
+              onClick={handleStartSigning}
               type="button"
             >
               {isSubmitting ? 'Assinando...' : 'Assinar contrato'}
@@ -410,6 +487,118 @@ export function InfluencerExperience() {
               Assinatura eletrônica com registro de data e hora.
             </p>
           </div>
+
+          {isContactModalOpen ? (
+            <div
+              aria-labelledby="contato-titulo"
+              aria-modal="true"
+              className={styles.modalOverlay}
+              onClick={() => setIsContactModalOpen(false)}
+              role="dialog"
+            >
+              <form
+                className={styles.modal}
+                onClick={(event) => event.stopPropagation()}
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  void handleSignContract()
+                }}
+              >
+                <button
+                  aria-label="Fechar"
+                  className={styles.modalClose}
+                  onClick={() => setIsContactModalOpen(false)}
+                  type="button"
+                >
+                  ×
+                </button>
+
+                <h3 className={styles.modalTitle} id="contato-titulo">
+                  Quase lá! <span className={styles.neon}>Como falamos com você?</span>
+                </h3>
+                <p className={styles.modalCopy}>
+                  Escolha onde quer receber a via assinada e os próximos passos da
+                  parceria.
+                </p>
+
+                <div className={styles.contactSwitch} role="radiogroup">
+                  <button
+                    aria-checked={contactKind === 'whatsapp'}
+                    className={
+                      contactKind === 'whatsapp'
+                        ? `${styles.contactOption} ${styles.contactOptionActive}`
+                        : styles.contactOption
+                    }
+                    onClick={() => handleContactKind('whatsapp')}
+                    role="radio"
+                    type="button"
+                  >
+                    WhatsApp
+                  </button>
+                  <button
+                    aria-checked={contactKind === 'email'}
+                    className={
+                      contactKind === 'email'
+                        ? `${styles.contactOption} ${styles.contactOptionActive}`
+                        : styles.contactOption
+                    }
+                    onClick={() => handleContactKind('email')}
+                    role="radio"
+                    type="button"
+                  >
+                    E-mail
+                  </button>
+                </div>
+
+                {contactKind === 'whatsapp' ? (
+                  <input
+                    aria-label="Seu WhatsApp com DDD"
+                    autoComplete="tel-national"
+                    autoFocus
+                    className={styles.contactInput}
+                    enterKeyHint="done"
+                    inputMode="tel"
+                    maxLength={15}
+                    name="tel"
+                    onChange={(event) => handleContactChange(event.target.value)}
+                    placeholder="(11) 99999-9999"
+                    type="tel"
+                    value={contact}
+                  />
+                ) : (
+                  <input
+                    aria-label="Seu e-mail"
+                    autoComplete="email"
+                    autoFocus
+                    className={styles.contactInput}
+                    enterKeyHint="done"
+                    inputMode="email"
+                    name="email"
+                    onChange={(event) => handleContactChange(event.target.value)}
+                    placeholder="voce@email.com"
+                    type="email"
+                    value={contact}
+                  />
+                )}
+
+                {contactError ? (
+                  <p className={styles.contactError}>{contactError}</p>
+                ) : (
+                  <p className={styles.contactHint}>
+                    Use o preenchimento automático do seu celular para ir mais rápido.
+                  </p>
+                )}
+
+                <button
+                  className={styles.signButton}
+                  disabled={isSubmitting || !isContactValid}
+                  type="submit"
+                >
+                  {isSubmitting ? 'Assinando...' : 'Confirmar e assinar'}
+                </button>
+              </form>
+            </div>
+          ) : null}
         </div>
       ) : null}
 

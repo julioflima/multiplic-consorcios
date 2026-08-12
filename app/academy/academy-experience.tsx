@@ -7,12 +7,10 @@ import { SiteFooter } from '@/components/site-footer'
 import {
   ACADEMY_PAGE,
   ACADEMY_SLIDES,
-  ACADEMY_TOPICS,
   findSlideIndex,
 } from './academy-data'
 import { AcademyBrowse } from './academy-browse'
 import { AcademyLessonSlide } from './academy-lesson-slide'
-import { AcademyRailChip } from './academy-rail-chip'
 import styles from './academy.module.css'
 
 /** Cópias da trilha para simular o feed vertical infinito. */
@@ -47,14 +45,6 @@ export function AcademyExperience() {
 
   const activeSlide = loopSlides[activeIndex] ?? loopSlides[BASE_LENGTH]
 
-  const topicStartIndex = useMemo(() => {
-    const map = new Map<string, number>()
-    ACADEMY_SLIDES.forEach((slide, index) => {
-      if (!map.has(slide.topicSlug)) map.set(slide.topicSlug, index)
-    })
-    return map
-  }, [])
-
   const scrollToIndex = useCallback(
     (index: number, behavior: ScrollBehavior = 'smooth') => {
       const target = containerRef.current?.children[index] as
@@ -84,15 +74,6 @@ export function AcademyExperience() {
       setPlayerOpen(true)
     },
     [],
-  )
-
-  const handleSelectTopic = useCallback(
-    (slug: string) => {
-      const offset = topicStartIndex.get(slug)
-      if (offset === undefined) return
-      goToIndex(BASE_LENGTH + offset)
-    },
-    [goToIndex, topicStartIndex],
   )
 
   const handleClosePlayer = useCallback(() => {
@@ -218,71 +199,6 @@ export function AcademyExperience() {
           aria-label={`${ACADEMY_PAGE.title} — player`}
         >
           <div className={styles.topBar}>
-            <div className={styles.topBarRow}>
-              <button
-                type="button"
-                className={styles.iconButton}
-                onClick={handleClosePlayer}
-                aria-label="Fechar player"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <path d="M6 6l12 12M18 6L6 18" />
-                </svg>
-              </button>
-
-              <span className={styles.playerTopicName}>
-                {activeSlide.topicLabel}
-              </span>
-
-              <button
-                type="button"
-                className={styles.iconButton}
-                onClick={handleToggleMuted}
-                aria-label={muted ? 'Ativar som' : 'Desativar som'}
-              >
-                {muted ? (
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M11 5L6 9H3v6h3l5 4z" />
-                    <path d="M17 9l4 6M21 9l-4 6" />
-                  </svg>
-                ) : (
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M11 5L6 9H3v6h3l5 4z" />
-                    <path d="M16 8.5a4.5 4.5 0 010 7M19 6a8 8 0 010 12" />
-                  </svg>
-                )}
-              </button>
-            </div>
-
             <div
               className={styles.progressRow}
               role="progressbar"
@@ -311,15 +227,87 @@ export function AcademyExperience() {
               )}
             </div>
 
-            <div className={styles.topicRail}>
-              {ACADEMY_TOPICS.map((topic) => (
-                <AcademyRailChip
-                  key={topic.slug}
-                  topic={topic}
-                  isActive={topic.slug === activeSlide.topicSlug}
-                  onSelect={handleSelectTopic}
-                />
-              ))}
+            <div className={styles.topBarRow}>
+              <button
+                type="button"
+                className={styles.topIcon}
+                onClick={handleToggleMuted}
+                aria-label={muted ? 'Ativar som' : 'Desativar som'}
+              >
+                {muted ? (
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M11.4 5.2L6.9 8.9H4.1a1.1 1.1 0 00-1.1 1.1v4a1.1 1.1 0 001.1 1.1h2.8l4.5 3.7a.7.7 0 001.15-.54V5.74a.7.7 0 00-1.15-.54z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M15.8 9.2a4 4 0 010 5.6"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.1"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M5.6 4.6L19.4 19.6"
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="3.6"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M5.6 4.6L19.4 19.6"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.1"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M11.4 5.2L6.9 8.9H4.1a1.1 1.1 0 00-1.1 1.1v4a1.1 1.1 0 001.1 1.1h2.8l4.5 3.7a.7.7 0 001.15-.54V5.74a.7.7 0 00-1.15-.54z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M15.8 9.2a4 4 0 010 5.6M18.7 6.6a8 8 0 010 10.8"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.1"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className={styles.topIcon}
+                onClick={handleClosePlayer}
+                aria-label="Fechar player"
+              >
+                <svg
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                >
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -336,56 +324,13 @@ export function AcademyExperience() {
                 isActive={index === activeIndex}
                 isNeighbor={Math.abs(index - activeIndex) === 1}
                 muted={muted}
+                onPrevious={handlePrevious}
+                onNext={handleNext}
+                onToggleSound={handleToggleMuted}
               />
             ))}
           </div>
 
-          <div className={styles.sideControls}>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={handlePrevious}
-              aria-label="Aula anterior"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  d="M5 15l7-7 7 7"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={handleNext}
-              aria-label="Próxima aula"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  d="M5 9l7 7 7-7"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
         </div>
       ) : null}
 

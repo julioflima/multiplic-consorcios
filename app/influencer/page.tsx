@@ -19,6 +19,14 @@ export const viewport = {
   initialScale: 1,
 }
 
-export default function InfluencerPage() {
-  return <InfluencerExperience />
+export default async function InfluencerPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const params = await searchParams
+  const rawEmail = params.email ?? params.e
+  const email = Array.isArray(rawEmail) ? rawEmail[0] : rawEmail
+
+  return <InfluencerExperience prefilledEmail={email?.trim() ?? ''} />
 }

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { SiteFooter } from '@/components/site-footer'
+
 import {
   ACADEMY_PAGE,
   ACADEMY_SLIDES,
@@ -386,6 +388,8 @@ export function AcademyExperience() {
           </div>
         </div>
       ) : null}
+
+      <SiteFooter className={styles.footer} />
     </main>
   )
 }

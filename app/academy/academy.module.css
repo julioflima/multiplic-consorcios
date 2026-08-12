@@ -408,8 +408,8 @@
   inset: auto;
   top: 50%;
   left: 50%;
-  width: 340%;
-  height: auto;
+  width: auto;
+  height: 102%;
   aspect-ratio: 16 / 9;
   transform: translate(-50%, -50%);
 }

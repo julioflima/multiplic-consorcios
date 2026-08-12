@@ -377,7 +377,6 @@
   position: relative;
   width: 100%;
   height: 100%;
-  max-width: min(56.25dvh, 100vw);
   overflow: hidden;
   background: #000;
 }
@@ -400,17 +399,18 @@
 }
 
 /*
- * O iframe é servido em 16:9 (player clássico, sem a UI de Shorts) e fica
- * centralizado com largura 340% do palco: o vídeo vertical dentro dele passa a
- * preencher a área visível e todos os controles nativos ficam fora do recorte.
+ * Mobile: imersão total. O iframe recebe exatamente 9:16 e é dimensionado para
+ * cobrir o palco (corta topo/base quando a tela é mais alta), então o vídeo
+ * preenche a tela inteira e a UI nativa do YouTube fica fora do recorte.
  */
 .player {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: auto;
-  height: 102%;
-  aspect-ratio: 16 / 9;
+  width: max(118%, 66.4dvh);
+  height: auto;
+  aspect-ratio: 9 / 16;
+  min-height: 118%;
   transform: translate(-50%, -50%);
 }
 
@@ -591,32 +591,48 @@
   background: rgba(64, 220, 120, 0.22);
 }
 
-.playBadge {
+.pausedBadges {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 6;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 78px;
-  height: 78px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.42);
-  color: #fff;
+  gap: 14px;
   pointer-events: none;
-  animation: playBadgeIn 0.18s ease-out;
 }
 
-@keyframes playBadgeIn {
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  animation: badgeIn 0.16s ease-out;
+}
+
+.badgeSound {
+  width: 44px;
+  height: 44px;
+}
+
+.badgePlay {
+  width: 60px;
+  height: 60px;
+  padding-left: 4px;
+}
+
+@keyframes badgeIn {
   from {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.86);
+    transform: scale(0.86);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
 }
 
@@ -652,6 +668,17 @@
 }
 
 @media (min-width: 900px) {
+  .stage {
+    max-width: min(56.25dvh, 100vw);
+  }
+
+  .player {
+    width: 100%;
+    height: 136%;
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+
   .topBar {
     padding: 18px 24px 26px;
   }

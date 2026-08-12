@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from "next/image";
+import Link from "next/link";
 
-import { ACADEMY_PAGE, ACADEMY_TOPICS } from './academy-data'
-import { AcademyTopicRow } from './academy-topic-row'
-import styles from './academy.module.css'
+import { ACADEMY_PAGE, ACADEMY_TOPICS } from "./academy-data";
+import { AcademyTopicRow } from "./academy-topic-row";
+import styles from "./academy.module.css";
 
 interface AcademyBrowseProps {
-  onOpenLesson: (topicSlug: string, lessonIndex: number) => void
+  onOpenLesson: (topicSlug: string, lessonIndex: number) => void;
 }
 
 export function AcademyBrowse({ onOpenLesson }: AcademyBrowseProps) {
@@ -46,10 +46,6 @@ export function AcademyBrowse({ onOpenLesson }: AcademyBrowseProps) {
           />
         ))}
       </div>
-
-      <footer className={styles.browseFooter}>
-        <span>{ACADEMY_PAGE.logoAlt}</span>
-      </footer>
     </div>
-  )
+  );
 }

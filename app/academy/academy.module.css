@@ -365,7 +365,7 @@
 
 .slide {
   position: relative;
-  height: 100dvh;
+  height: 100svh;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   display: flex;
@@ -407,11 +407,10 @@
   inset: auto;
   top: 50%;
   left: 50%;
-  width: max(118%, 66.4dvh);
-  height: auto;
-  aspect-ratio: 9 / 16;
-  min-height: 118%;
+  width: max(118vw, 66.4svh);
+  height: max(209.8vw, 118svh);
   transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .poster {
@@ -544,7 +543,7 @@
   top: 56px;
   left: 0;
   right: 0;
-  bottom: 84px;
+  bottom: 0;
   z-index: 5;
   display: flex;
   pointer-events: none;
@@ -555,6 +554,8 @@
   pointer-events: auto;
   padding: 0;
   border: 0;
+  appearance: none;
+  background: transparent;
   cursor: pointer;
   color: #fff;
   font: 700 11px/1 var(--font-sans, system-ui, sans-serif);
@@ -567,7 +568,6 @@
 
 .tapPrev {
   flex: 0 0 33.33%;
-  background: rgba(255, 64, 64, 0.22);
 }
 
 .tapCenter {
@@ -578,24 +578,20 @@
 
 .tapSound {
   flex: 0 0 40%;
-  background: rgba(64, 132, 255, 0.28);
 }
 
 .tapPlay {
   flex: 1 1 auto;
-  background: rgba(255, 205, 64, 0.22);
 }
 
 .tapNext {
   flex: 0 0 33.34%;
-  background: rgba(64, 220, 120, 0.22);
 }
 
 .pausedBadges {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  justify-content: center;
   z-index: 6;
   display: flex;
   flex-direction: column;
@@ -609,7 +605,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(83, 78, 78, 0.55);
   color: #fff;
   animation: badgeIn 0.16s ease-out;
 }
@@ -620,9 +616,10 @@
 }
 
 .badgePlay {
-  width: 60px;
-  height: 60px;
-  padding-left: 4px;
+  top: 100px;
+  position: absolute;
+  width: 54px;
+  height: 54px;
 }
 
 @keyframes badgeIn {
@@ -669,7 +666,7 @@
 
 @media (min-width: 900px) {
   .stage {
-    max-width: min(56.25dvh, 100vw);
+    max-width: min(56.25svh, 100vw);
   }
 
   .player {

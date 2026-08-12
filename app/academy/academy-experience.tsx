@@ -247,7 +247,7 @@ export function AcademyExperience() {
 
               <button
                 type="button"
-                className={`${styles.topIcon} ${styles.topIconSound}`}
+                className={styles.topIcon}
                 onClick={handleToggleMuted}
                 aria-label={muted ? "Ativar som" : "Desativar som"}
               >

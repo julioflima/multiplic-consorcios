@@ -115,10 +115,18 @@ export function AcademyLessonSlide({
       return () => window.clearTimeout(reset);
     }
 
-    const timer = window.setTimeout(() => {
-      sendCommand(muted ? "mute" : "unMute");
-      sendCommand("playVideo");
-    }, 320);
+    const timer = window.setTimeout(() => sendCommand("playVideo"), 320);
+
+    return () => window.clearTimeout(timer);
+  }, [isActive, sendCommand]);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    const timer = window.setTimeout(
+      () => sendCommand(muted ? "mute" : "unMute"),
+      120,
+    );
 
     return () => window.clearTimeout(timer);
   }, [isActive, muted, sendCommand]);
@@ -193,7 +201,7 @@ export function AcademyLessonSlide({
         {paused ? (
           <div className={styles.pausedBadges} aria-hidden="true">
             <span className={`${styles.badge} ${styles.badgePlay}`}>
-              <svg width="34" height="34" viewBox="0 0 24 24">
+              <svg width="26" height="26" viewBox="0 0 24 24">
                 <path
                   d="M8.6 5.4l10 6.1a.6.6 0 010 1l-10 6.1a.6.6 0 01-.9-.5V5.9a.6.6 0 01.9-.5z"
                   fill="currentColor"

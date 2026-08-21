@@ -11,8 +11,6 @@ interface AcademyLessonSlideProps {
   isActive: boolean;
   isNeighbor: boolean;
   muted: boolean;
-  onPrevious: () => void;
-  onNext: () => void;
   onToggleSound: () => void;
 }
 
@@ -22,8 +20,6 @@ export function AcademyLessonSlide({
   isActive,
   isNeighbor,
   muted,
-  onPrevious,
-  onNext,
   onToggleSound,
 }: AcademyLessonSlideProps) {
   const frameRef = useRef<HTMLIFrameElement | null>(null);
@@ -167,25 +163,9 @@ export function AcademyLessonSlide({
         <div className={styles.tapLayer}>
           <button
             type="button"
-            className={`${styles.tapZone} ${styles.tapPrev}`}
-            onClick={onPrevious}
-            aria-label="Aula anterior"
-          />
-
-          <div className={styles.tapCenter}>
-            <button
-              type="button"
-              className={`${styles.tapZone} ${styles.tapSound}`}
-              onClick={onToggleSound}
-              aria-label={muted ? "Ativar som" : "Desativar som"}
-            />
-          </div>
-
-          <button
-            type="button"
-            className={`${styles.tapZone} ${styles.tapNext}`}
-            onClick={onNext}
-            aria-label="Próxima aula"
+            className={`${styles.tapZone} ${styles.tapSound}`}
+            onClick={onToggleSound}
+            aria-label={muted ? "Ativar som" : "Desativar som"}
           />
         </div>
 

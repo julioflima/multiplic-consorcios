@@ -21,7 +21,10 @@ function createQueryClient() {
     defaultOptions: {
       queries: {
         persister,
-        gcTime: MAX_PERSISTED_AGE,
+        // Infinity em vez de MAX_PERSISTED_AGE: gcTime vira um setTimeout
+        // interno, e 30 dias em ms estoura o limite de 32 bits do
+        // setTimeout (~24.8 dias), disparando cedo demais.
+        gcTime: Infinity,
       },
     },
   });

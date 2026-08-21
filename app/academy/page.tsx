@@ -1,6 +1,10 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 
 import { AcademyExperience } from './academy-experience'
+
+export const viewport: Viewport = {
+  themeColor: '#000000',
+}
 
 export const metadata: Metadata = {
   title: {
@@ -12,6 +16,11 @@ export const metadata: Metadata = {
     title: 'Multicon Academy',
     description:
       'Formação em consórcio em aulas de um minuto: consórcio, alavancagem, grupo fixo, imóvel e veículo.',
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Academy',
   },
 }
 

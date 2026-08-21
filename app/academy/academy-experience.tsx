@@ -34,6 +34,31 @@ export function AcademyExperience() {
     activeIndexRef.current = activeIndex;
   }, [activeIndex]);
 
+  /**
+   * A Academy é toda preta e imersiva; sem isso, o bounce elástico do iOS ao
+   * puxar além do topo/fundo revela o branco do body por trás, quebrando a
+   * sensação de app. Escopado ao tempo de vida deste componente para não
+   * afetar o resto do site (que é claro por design).
+   */
+  useEffect(() => {
+    const html = document.documentElement;
+    const { body } = document;
+
+    const previousHtmlOverscroll = html.style.overscrollBehaviorY;
+    const previousBodyOverscroll = body.style.overscrollBehaviorY;
+    const previousBodyBackground = body.style.background;
+
+    html.style.overscrollBehaviorY = "none";
+    body.style.overscrollBehaviorY = "none";
+    body.style.background = "#000";
+
+    return () => {
+      html.style.overscrollBehaviorY = previousHtmlOverscroll;
+      body.style.overscrollBehaviorY = previousBodyOverscroll;
+      body.style.background = previousBodyBackground;
+    };
+  }, []);
+
   const loopSlides = useMemo(
     () =>
       Array.from({ length: LOOP_COPIES }).flatMap((_, copy) =>

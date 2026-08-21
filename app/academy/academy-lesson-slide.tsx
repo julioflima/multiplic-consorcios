@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { AcademySlide } from "./academy-data";
 import styles from "./academy.module.css";
@@ -27,16 +27,22 @@ export function AcademyLessonSlide({
   onToggleSound,
 }: AcademyLessonSlideProps) {
   const frameRef = useRef<HTMLIFrameElement | null>(null);
-  const mutedRef = useRef(muted);
 
-  useEffect(() => {
-    mutedRef.current = muted;
-  }, [muted]);
+  // Congela a preferência de som no instante em que o vídeo vira o ativo —
+  // um scroll/tap é um gesto do usuário, então o navegador permite autoplay
+  // com som já nascendo com o valor correto, sem precisar de unMute via
+  // postMessage depois (que o navegador bloqueia/pausa sem gesto novo).
+  const [committedMuted, setCommittedMuted] = useState(muted);
+  const [prevIsActive, setPrevIsActive] = useState(isActive);
+  if (isActive !== prevIsActive) {
+    setPrevIsActive(isActive);
+    if (isActive) setCommittedMuted(muted);
+  }
 
   const embedSrc = useMemo(() => {
     const params = new URLSearchParams({
       autoplay: "1",
-      mute: "1",
+      mute: committedMuted ? "1" : "0",
       controls: "0",
       rel: "0",
       playsinline: "1",
@@ -48,7 +54,7 @@ export function AcademyLessonSlide({
     });
 
     return `https://www.youtube-nocookie.com/embed/${slide.videoId}?${params.toString()}`;
-  }, [slide.videoId]);
+  }, [slide.videoId, committedMuted]);
 
   const sendCommand = useCallback(
     (command: string, args: (string | number)[] = []) => {
@@ -71,7 +77,6 @@ export function AcademyLessonSlide({
         JSON.stringify({ event: "listening", id: `slide-${index}` }),
         "*",
       );
-      sendCommand(mutedRef.current ? "mute" : "unMute");
     };
 
     const interval = window.setInterval(subscribe, 600);

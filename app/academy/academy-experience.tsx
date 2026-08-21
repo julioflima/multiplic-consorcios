@@ -4,7 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { SiteFooter } from "@/components/site-footer";
 
-import { ACADEMY_PAGE, ACADEMY_SLIDES, findSlideIndex } from "./academy-data";
+import {
+  ACADEMY_PAGE,
+  ACADEMY_SLIDES,
+  findSlideIndex,
+  findSlideIndexByShareId,
+} from "./academy-data";
 import { AcademyBrowse } from "./academy-browse";
 import { AcademyLessonSlide } from "./academy-lesson-slide";
 import { useAcademyMuted } from "./use-academy-muted";
@@ -61,16 +66,19 @@ export function AcademyExperience() {
     [loopSlides.length, scrollToIndex],
   );
 
+  const openAtOffset = useCallback((offset: number) => {
+    if (offset < 0) return;
+
+    pendingIndexRef.current = BASE_LENGTH + offset;
+    setActiveIndex(BASE_LENGTH + offset);
+    setPlayerOpen(true);
+  }, []);
+
   const handleOpenLesson = useCallback(
     (topicSlug: string, lessonIndex: number) => {
-      const offset = findSlideIndex(topicSlug, lessonIndex);
-      if (offset < 0) return;
-
-      pendingIndexRef.current = BASE_LENGTH + offset;
-      setActiveIndex(BASE_LENGTH + offset);
-      setPlayerOpen(true);
+      openAtOffset(findSlideIndex(topicSlug, lessonIndex));
     },
-    [],
+    [openAtOffset],
   );
 
   const handleClosePlayer = useCallback(() => {
@@ -171,9 +179,23 @@ export function AcademyExperience() {
     };
   }, [handleClosePlayer, handleNext, handlePrevious, playerOpen]);
 
+  /**
+   * Abre direto na aula compartilhada, se a URL trouxer um id de vídeo.
+   * Fica num efeito (em vez de estado inicial lazy) de propósito: ler
+   * location.hash durante a renderização divergiria do HTML do servidor,
+   * quebrando a hidratação.
+   */
+  useEffect(() => {
+    const sharedId = window.location.hash.slice(1);
+    if (!sharedId) return;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    openAtOffset(findSlideIndexByShareId(sharedId));
+  }, [openAtOffset]);
+
   useEffect(() => {
     if (!playerOpen || !activeSlide) return;
-    window.history.replaceState(null, "", `/academy#${activeSlide.topicSlug}`);
+    window.history.replaceState(null, "", `/academy#${activeSlide.shareId}`);
   }, [activeSlide, playerOpen]);
 
   useEffect(

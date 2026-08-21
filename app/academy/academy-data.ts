@@ -29,6 +29,8 @@ export interface AcademyPageContent {
 
 export interface AcademySlide {
   key: string
+  /** Id curto e estável derivado da URL de origem do vídeo — usado para compartilhar/linkar direto para esta aula. */
+  shareId: string
   topicSlug: string
   topicLabel: string
   topicAccent: string
@@ -66,6 +68,18 @@ export function youtubeThumbnail(videoId: string): string {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
 }
 
+/** Hash determinístico (FNV-1a) que encurta a URL de origem do vídeo em um id curto e estável. */
+export function shareIdFromUrl(url: string): string {
+  let hash = 0x811c9dc5
+
+  for (let i = 0; i < url.length; i++) {
+    hash ^= url.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193)
+  }
+
+  return (hash >>> 0).toString(36)
+}
+
 export function buildAcademySlides(topics: AcademyTopic[]): AcademySlide[] {
   return topics.flatMap((topic, topicIndex) =>
     topic.lessons.map((lesson, lessonIndex) => {
@@ -73,6 +87,7 @@ export function buildAcademySlides(topics: AcademyTopic[]): AcademySlide[] {
 
       return {
         key: `${topic.slug}-${lessonIndex}`,
+        shareId: shareIdFromUrl(lesson.url),
         topicSlug: topic.slug,
         topicLabel: topic.label,
         topicAccent: topic.accent,
@@ -95,4 +110,8 @@ export function findSlideIndex(topicSlug: string, lessonIndex: number): number {
   return ACADEMY_SLIDES.findIndex(
     (slide) => slide.key === `${topicSlug}-${lessonIndex}`,
   )
+}
+
+export function findSlideIndexByShareId(shareId: string): number {
+  return ACADEMY_SLIDES.findIndex((slide) => slide.shareId === shareId)
 }

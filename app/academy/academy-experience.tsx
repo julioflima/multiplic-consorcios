@@ -20,9 +20,20 @@ const LOOP_COPIES = 3;
 
 const BASE_LENGTH = ACADEMY_SLIDES.length;
 
-export function AcademyExperience() {
-  const [playerOpen, setPlayerOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(BASE_LENGTH);
+interface AcademyExperienceProps {
+  /** Id da aula vinda da URL (/academy/[shareId]), já resolvida no servidor. */
+  initialShareId?: string;
+}
+
+export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
+  const initialOffset = initialShareId
+    ? findSlideIndexByShareId(initialShareId)
+    : -1;
+
+  const [playerOpen, setPlayerOpen] = useState(initialOffset >= 0);
+  const [activeIndex, setActiveIndex] = useState(
+    initialOffset >= 0 ? BASE_LENGTH + initialOffset : BASE_LENGTH,
+  );
   const [muted, setMuted] = useAcademyMuted();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -205,22 +216,13 @@ export function AcademyExperience() {
   }, [handleClosePlayer, handleNext, handlePrevious, playerOpen]);
 
   /**
-   * Abre direto na aula compartilhada, se a URL trouxer um id de vídeo.
-   * Fica num efeito (em vez de estado inicial lazy) de propósito: ler
-   * location.hash durante a renderização divergiria do HTML do servidor,
-   * quebrando a hidratação.
+   * Mantém a URL como /academy/[shareId] (rota de verdade, não hash) — no
+   * reload, o servidor já abre direto na aula certa, sem o "pisca" de
+   * aterrissar no browse e só depois pular pro player.
    */
   useEffect(() => {
-    const sharedId = window.location.hash.slice(1);
-    if (!sharedId) return;
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    openAtOffset(findSlideIndexByShareId(sharedId));
-  }, [openAtOffset]);
-
-  useEffect(() => {
     if (!playerOpen || !activeSlide) return;
-    window.history.replaceState(null, "", `/academy#${activeSlide.shareId}`);
+    window.history.replaceState(null, "", `/academy/${activeSlide.shareId}`);
   }, [activeSlide, playerOpen]);
 
   useEffect(
@@ -369,11 +371,51 @@ export function AcademyExperience() {
                 isActive={index === activeIndex}
                 isNeighbor={Math.abs(index - activeIndex) === 1}
                 muted={muted}
-                onPrevious={handlePrevious}
-                onNext={handleNext}
                 onToggleSound={handleToggleMuted}
               />
             ))}
+          </div>
+
+          {/* Desktop não tem swipe — mobile só conhece rolar pra cima/baixo. */}
+          <div className={styles.desktopNav}>
+            <button
+              type="button"
+              className={styles.desktopNavButton}
+              onClick={handlePrevious}
+              aria-label="Aula anterior"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4.5 15L12 7.5L19.5 15" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={styles.desktopNavButton}
+              onClick={handleNext}
+              aria-label="Próxima aula"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4.5 9L12 16.5L19.5 9" />
+              </svg>
+            </button>
           </div>
         </div>
       ) : null}

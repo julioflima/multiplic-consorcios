@@ -567,22 +567,12 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.tapPrev {
-  flex: 0 0 33.33%;
-}
-
-.tapCenter {
-  flex: 0 0 33.33%;
-  display: flex;
-  flex-direction: column;
-}
-
 .tapSound {
   flex: 1 1 auto;
 }
 
-.tapNext {
-  flex: 0 0 33.34%;
+.desktopNav {
+  display: none;
 }
 
 .progressRow {
@@ -633,6 +623,44 @@
 
   .slideBody {
     padding: 0 66px 40px 24px;
+  }
+}
+
+/* Setas de navegação: só para quem usa mouse — no touch o gesto é rolar. */
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .desktopNav {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: absolute;
+    top: 50%;
+    right: max(24px, calc((100% - min(56.25svh, 100vw)) / 2 - 76px));
+    transform: translateY(-50%);
+    z-index: 20;
+  }
+
+  .desktopNavButton {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(10, 10, 10, 0.55);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .desktopNavButton:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: scale(1.05);
+  }
+
+  .desktopNavButton:active {
+    transform: scale(0.96);
   }
 }
 

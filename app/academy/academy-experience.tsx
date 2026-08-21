@@ -546,11 +546,15 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
             onScroll={handleFeedScroll}
           >
             {/*
-              O player único acompanha a rolagem via position: sticky, em vez
-              de ser movido no DOM — reparentar um iframe faz o navegador
-              recarregá-lo, que é exatamente o que precisamos evitar.
+              O player único é ancorado na altura do slide ativo em vez de ser
+              movido no DOM: reparentar um iframe faz o navegador recarregá-lo,
+              que é exatamente o que precisamos evitar.
             */}
-            <div className={styles.playerLayer} aria-hidden="true">
+            <div
+              className={styles.playerLayer}
+              style={{ ["--slide-offset" as string]: activeIndex }}
+              aria-hidden="true"
+            >
               <div className={styles.playerLayerInner}>
                 <div ref={playerHostRef} />
               </div>

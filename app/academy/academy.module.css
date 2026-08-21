@@ -403,24 +403,25 @@
 }
 
 /*
- * Camada do player único. Fica sticky no topo do feed (altura 0 pra não
- * ocupar espaço nem virar ponto de snap) e o filho cobre a viewport, sempre
- * sobre o slide ativo. z-index 2: acima dos pôsteres, abaixo da UI (5+).
+ * Camada do player único. Fica ancorada na ALTURA do slide ativo (e não presa
+ * no topo da viewport): como é absolute dentro do feed, que é o container de
+ * rolagem, ela rola junto com o conteúdo — o vídeo sai de cena junto com o
+ * slide, igual a stories. Está fora do fluxo, então não vira ponto de snap.
+ * z-index 2: acima dos pôsteres, abaixo da UI (5+).
  */
 .playerLayer {
-  position: sticky;
-  top: 0;
-  height: 0;
+  position: absolute;
+  top: calc(var(--slide-offset, 0) * 100dvh);
+  left: 0;
+  right: 0;
+  height: 100dvh;
   z-index: 2;
   pointer-events: none;
 }
 
 .playerLayerInner {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100dvh;
+  inset: 0;
   overflow: hidden;
 }
 
@@ -442,8 +443,7 @@
 
 .poster {
   object-fit: cover;
-  transform: scale(1.32);
-  filter: brightness(0.55) saturate(0.9);
+  filter: brightness(0.6) saturate(0.9);
 }
 
 .playerVeil {
@@ -553,18 +553,14 @@
   color: #fff;
   cursor: pointer;
   pointer-events: auto;
-  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.2));
   transition: background 0.18s ease;
 }
 
 .topIcon:hover,
 .topIcon:focus-visible {
-  background: rgba(0, 0, 0, 0.42);
+  background: rgba(0, 0, 0, 0.15  );
   outline: none;
-}
-
-.topIcon:active {
-  background: rgba(0, 0, 0, 0.55);
 }
 
 .tapLayer {

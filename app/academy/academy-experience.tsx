@@ -80,7 +80,7 @@ export function AcademyExperience() {
 
   const handleToggleMuted = useCallback(() => {
     setMuted((current) => !current);
-  }, []);
+  }, [setMuted]);
 
   const handlePrevious = useCallback(() => {
     goToIndex(activeIndexRef.current - 1);

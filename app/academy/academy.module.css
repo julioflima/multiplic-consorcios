@@ -615,11 +615,25 @@
 }
 
 .progressSegmentDone {
-  background: #fff;
+  background: var(--topic-accent);
 }
 
+/*
+ * O segmento da aula atual é o trilho; quem mostra o avanço é .progressFill
+ * por dentro dele (o overflow: hidden de .progressSegment mantém o raio).
+ */
 .progressSegmentActive {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.progressFill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
   background: var(--topic-accent);
+  /* Cobre o intervalo entre as amostras do polling (250ms). */
+  transition: width 0.25s linear;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -98,6 +98,7 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   const loadedVideoIdRef = useRef<string | null>(null);
   const soundFallbackRef = useRef<number | null>(null);
   const hasPlayedRef = useRef(false);
+  const progressFillRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     mutedRef.current = muted;
@@ -242,6 +243,16 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
     goToIndex(activeIndexRef.current + 1);
   }, [goToIndex]);
 
+  // O player é criado uma vez só; guardar handleNext num ref evita que o
+  // onStateChange fique preso na versão daquele render — e evita ter que
+  // colocá-lo nas deps do efeito, o que recriaria o player (e perderia a
+  // permissão de áudio) sempre que ele mudasse.
+  const handleNextRef = useRef(handleNext);
+
+  useEffect(() => {
+    handleNextRef.current = handleNext;
+  }, [handleNext]);
+
   /** Reposiciona o scroll na cópia central mantendo o loop imperceptível. */
   const recenter = useCallback(() => {
     const container = containerRef.current;
@@ -377,9 +388,9 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
             }
             if (event.data === YT_PAUSED) setIsPlaying(false);
 
+            // Fim da aula: segue pra próxima, como num feed de stories.
             if (event.data !== YT_ENDED) return;
-            event.target.seekTo(0, true);
-            event.target.playVideo();
+            handleNextRef.current();
           },
         },
       });
@@ -405,6 +416,9 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
 
     if (loadedVideoIdRef.current !== activeSlide.videoId) {
       loadedVideoIdRef.current = activeSlide.videoId;
+      // Zera na hora: se o segmento ativo for o mesmo índice da aula anterior,
+      // React reusa o elemento e a largura antiga ficaria até o próximo tick.
+      if (progressFillRef.current) progressFillRef.current.style.width = "0%";
       player.loadVideoById(activeSlide.videoId);
     }
 
@@ -461,6 +475,33 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
     window.history.replaceState(null, "", `/academy/${activeSlide.shareId}`);
   }, [activeSlide, playerOpen]);
 
+  /**
+   * A IFrame API não emite evento de progresso, então é polling mesmo.
+   * Escreve direto no DOM em vez de usar estado: a barra atualiza várias
+   * vezes por segundo e um setState re-renderizaria o feed inteiro a cada
+   * tick. O transition no CSS cobre o intervalo entre as amostras.
+   */
+  useEffect(() => {
+    if (!playerOpen) return;
+
+    const tick = () => {
+      const player = playerRef.current;
+      const fill = progressFillRef.current;
+      if (!player || !fill) return;
+
+      const duration = player.getDuration();
+      if (!duration) return;
+
+      const ratio = Math.min(player.getCurrentTime() / duration, 1);
+      fill.style.width = `${ratio * 100}%`;
+    };
+
+    const interval = window.setInterval(tick, 250);
+    tick();
+
+    return () => window.clearInterval(interval);
+  }, [playerOpen]);
+
   useEffect(
     () => () => {
       if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
@@ -515,7 +556,14 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
                     ]
                       .filter(Boolean)
                       .join(" ")}
-                  />
+                  >
+                    {segment === activeSlide.step - 1 ? (
+                      <span
+                        ref={progressFillRef}
+                        className={styles.progressFill}
+                      />
+                    ) : null}
+                  </span>
                 ),
               )}
             </div>

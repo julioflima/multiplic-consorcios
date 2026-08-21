@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import type { AcademySlide } from "./academy-data";
 import styles from "./academy.module.css";
@@ -27,7 +27,6 @@ export function AcademyLessonSlide({
   onToggleSound,
 }: AcademyLessonSlideProps) {
   const frameRef = useRef<HTMLIFrameElement | null>(null);
-  const [paused, setPaused] = useState(false);
 
   const embedSrc = useMemo(() => {
     const params = new URLSearchParams({
@@ -86,9 +85,6 @@ export function AcademyLessonSlide({
           sendCommand("seekTo", [0, 1]);
           sendCommand("playVideo");
         }
-        if (state === 1 || state === 2) {
-          setPaused(state === 2);
-        }
       } catch {
         // mensagens que não são JSON do player são ignoradas
       }
@@ -102,18 +98,8 @@ export function AcademyLessonSlide({
     };
   }, [index, isActive, sendCommand]);
 
-  const handleTogglePlay = useCallback(() => {
-    setPaused((current) => {
-      sendCommand(current ? "playVideo" : "pauseVideo");
-      return !current;
-    });
-  }, [sendCommand]);
-
   useEffect(() => {
-    if (!isActive) {
-      const reset = window.setTimeout(() => setPaused(false), 0);
-      return () => window.clearTimeout(reset);
-    }
+    if (!isActive) return;
 
     const timer = window.setTimeout(() => sendCommand("playVideo"), 320);
 
@@ -182,12 +168,6 @@ export function AcademyLessonSlide({
               onClick={onToggleSound}
               aria-label={muted ? "Ativar som" : "Desativar som"}
             />
-            <button
-              type="button"
-              className={`${styles.tapZone} ${styles.tapPlay}`}
-              onClick={handleTogglePlay}
-              aria-label={paused ? "Reproduzir" : "Pausar"}
-            />
           </div>
 
           <button
@@ -197,22 +177,6 @@ export function AcademyLessonSlide({
             aria-label="Próxima aula"
           />
         </div>
-
-        {paused ? (
-          <div className={styles.pausedBadges} aria-hidden="true">
-            <span className={`${styles.badge} ${styles.badgePlay}`}>
-              <svg width="26" height="26" viewBox="0 0 24 24">
-                <path
-                  d="M8.6 5.4l10 6.1a.6.6 0 010 1l-10 6.1a.6.6 0 01-.9-.5V5.9a.6.6 0 01.9-.5z"
-                  fill="currentColor"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-          </div>
-        ) : null}
 
         <div className={styles.slideBody}>
           <span className={styles.slideTopic}>

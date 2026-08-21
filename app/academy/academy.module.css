@@ -173,12 +173,10 @@
 .rowTrack {
   display: flex;
   /*
-   * Precisa ser maior que a expansão lateral do hover: o card de ~208px em
-   * scale(1.14) cresce 29px, ~14,5px pra cada lado. Com o gap de 14px que
-   * havia aqui, a expansão comia a folga inteira e o card encostava nos
-   * vizinhos. 32px deixa ~17px de respiro visível mesmo com o card crescido.
+   * Gap justo: a folga do hover não vem daqui, vem dos vizinhos se afastando
+   * (ver .rowItem mais abaixo), que é como a Netflix faz.
    */
-  gap: 24px;
+  gap: 14px;
   /*
    * O padding é a folga pro card crescer no hover. overflow-x: auto força
    * overflow-y a clipar (não dá pra ter um eixo visível e o outro rolável),
@@ -204,6 +202,27 @@
 .rowItem {
   flex: 0 0 auto;
   scroll-snap-align: start;
+}
+
+/*
+ * Efeito Netflix: os vizinhos abrem espaço pro card em hover em vez de o gap
+ * ser grande o tempo todo. O card cresce ~14,5px pra cada lado no scale, e os
+ * irmãos deslizam 16px pro lado oposto — os seguintes com `~`, os anteriores
+ * com :has(~ ...). É transform puro, então não há reflow: nada muda de lugar
+ * no layout e o cursor não "perde" o card embaixo dele.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .rowItem {
+    transition: transform 0.28s cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  .rowItem:has(.card:hover) ~ .rowItem {
+    transform: translateX(16px);
+  }
+
+  .rowItem:has(~ .rowItem .card:hover) {
+    transform: translateX(-16px);
+  }
 }
 
 .rowArrow {

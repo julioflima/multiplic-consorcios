@@ -45,11 +45,6 @@ export function AcademyLessonCard({
         <span className={styles.cardNumber}>
           {String(lessonIndex + 1).padStart(2, '0')}
         </span>
-        <span className={styles.cardPlay}>
-          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
-          </svg>
-        </span>
       </span>
 
       <span className={styles.cardBody}>

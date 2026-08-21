@@ -28,6 +28,9 @@ const LOOP_COPIES = 3;
 
 const BASE_LENGTH = ACADEMY_SLIDES.length;
 
+/** Quanto antes do fim a próxima aula entra, pra pular a tela final do YouTube. */
+const END_LEAD_SECONDS = 0.45;
+
 function easeInOutCubic(t: number) {
   return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 }
@@ -100,6 +103,8 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   const loadedVideoIdRef = useRef<string | null>(null);
   const soundFallbackRef = useRef<number | null>(null);
   const hasPlayedRef = useRef(false);
+  /** Trava pra o avanço automático disparar uma vez só por aula. */
+  const advancedRef = useRef(false);
   const progressFillRef = useRef<HTMLSpanElement | null>(null);
   const playerLayerRef = useRef<HTMLDivElement | null>(null);
 
@@ -182,10 +187,10 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   );
 
   const goToIndex = useCallback(
-    (index: number) => {
+    (index: number, behavior: ScrollBehavior = "smooth") => {
       const clamped = Math.max(0, Math.min(loopSlides.length - 1, index));
       setActiveIndex(clamped);
-      scrollToIndex(clamped);
+      scrollToIndex(clamped, behavior);
     },
     [loopSlides.length, scrollToIndex],
   );
@@ -257,15 +262,25 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
     goToIndex(activeIndexRef.current + 1);
   }, [goToIndex]);
 
-  // O player é criado uma vez só; guardar handleNext num ref evita que o
-  // onStateChange fique preso na versão daquele render — e evita ter que
-  // colocá-lo nas deps do efeito, o que recriaria o player (e perderia a
-  // permissão de áudio) sempre que ele mudasse.
-  const handleNextRef = useRef(handleNext);
+  /**
+   * Avanço automático no fim da aula: corte seco, sem a rolagem animada.
+   * Com a animação de 420ms o slide que acabou fica na tela quase meio
+   * segundo com o player já escondido — ou seja, exibindo o pôster da aula
+   * ANTERIOR. Em stories a passagem é um corte, e é isso que se espera aqui.
+   */
+  const advanceToNext = useCallback(() => {
+    goToIndex(activeIndexRef.current + 1, "auto");
+  }, [goToIndex]);
+
+  // O player é criado uma vez só; guardar num ref evita que o onStateChange
+  // fique preso na versão daquele render — e evita ter que colocá-lo nas
+  // deps do efeito, o que recriaria o player (e perderia a permissão de
+  // áudio) sempre que ele mudasse.
+  const advanceToNextRef = useRef(advanceToNext);
 
   useEffect(() => {
-    handleNextRef.current = handleNext;
-  }, [handleNext]);
+    advanceToNextRef.current = advanceToNext;
+  }, [advanceToNext]);
 
   /** Reposiciona o scroll na cópia central mantendo o loop imperceptível. */
   const recenter = useCallback(() => {
@@ -422,10 +437,14 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
             }
             if (event.data === YT_PAUSED) setIsPlaying(false);
 
-            // Fim da aula: segue pra próxima, como num feed de stories.
+            // Rede de segurança: o normal é o polling avançar antes daqui
+            // (ver END_LEAD_SECONDS). Só cai neste caso se o tick perder a
+            // janela — vídeo muito curto, aba em segundo plano, etc.
             if (event.data !== YT_ENDED) return;
+            if (advancedRef.current) return;
+            advancedRef.current = true;
             setPlayerVisible(false);
-            handleNextRef.current();
+            advanceToNextRef.current();
           },
         },
       });
@@ -451,6 +470,7 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
 
     if (loadedVideoIdRef.current !== activeSlide.videoId) {
       loadedVideoIdRef.current = activeSlide.videoId;
+      advancedRef.current = false;
       // Zera na hora: se o segmento ativo for o mesmo índice da aula anterior,
       // React reusa o elemento e a largura antiga ficaria até o próximo tick.
       if (progressFillRef.current) progressFillRef.current.style.width = "0%";
@@ -524,21 +544,35 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
 
     const tick = () => {
       const player = playerRef.current;
-      const fill = progressFillRef.current;
-      if (!player || !fill) return;
+      if (!player) return;
 
       const duration = player.getDuration();
       if (!duration) return;
 
-      const ratio = Math.min(player.getCurrentTime() / duration, 1);
-      fill.style.width = `${ratio * 100}%`;
+      const currentTime = player.getCurrentTime();
+
+      const fill = progressFillRef.current;
+      if (fill) fill.style.width = `${Math.min(currentTime / duration, 1) * 100}%`;
+
+      // Avança ANTES do fim. Se deixarmos chegar em ENDED, o YouTube troca o
+      // vídeo pela tela final dele (capa grande + replay) — e aí não adianta
+      // esconder o player, a capa já apareceu.
+      if (advancedRef.current) return;
+      if (duration - currentTime > END_LEAD_SECONDS) return;
+      if (player.getPlayerState() !== YT_PLAYING) return;
+
+      advancedRef.current = true;
+      setPlayerVisible(false);
+      advanceToNextRef.current();
     };
 
-    const interval = window.setInterval(tick, 250);
+    // Amostragem mais curta que o lead: com 250ms o tick poderia cair depois
+    // do fim do vídeo e perder a janela de antecipação.
+    const interval = window.setInterval(tick, 120);
     tick();
 
     return () => window.clearInterval(interval);
-  }, [playerOpen]);
+  }, [playerOpen, setPlayerVisible]);
 
   useEffect(
     () => () => {

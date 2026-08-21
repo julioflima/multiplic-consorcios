@@ -7,7 +7,8 @@ interface AcademyLessonSlideProps {
   slide: AcademySlide;
   index: number;
   muted: boolean;
-  onToggleSound: () => void;
+  isPlaying: boolean;
+  onTap: () => void;
 }
 
 /**
@@ -19,8 +20,15 @@ export function AcademyLessonSlide({
   slide,
   index,
   muted,
-  onToggleSound,
+  isPlaying,
+  onTap,
 }: AcademyLessonSlideProps) {
+  const tapLabel = !isPlaying
+    ? "Reproduzir"
+    : muted
+      ? "Ativar som"
+      : "Pausar";
+
   return (
     <section
       className={styles.slide}
@@ -45,8 +53,8 @@ export function AcademyLessonSlide({
           <button
             type="button"
             className={`${styles.tapZone} ${styles.tapSound}`}
-            onClick={onToggleSound}
-            aria-label={muted ? "Ativar som" : "Desativar som"}
+            onClick={onTap}
+            aria-label={tapLabel}
           />
         </div>
 

@@ -15,7 +15,9 @@ import { AcademyLessonSlide } from "./academy-lesson-slide";
 import { useAcademyMuted } from "./use-academy-muted";
 import {
   loadYouTubeApi,
+  YT_BUFFERING,
   YT_ENDED,
+  YT_PAUSED,
   YT_PLAYING,
   type YTPlayer,
 } from "./youtube-api";
@@ -88,10 +90,14 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   const idleTimerRef = useRef<number | null>(null);
   const cancelScrollRef = useRef<() => void>(() => {});
 
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const playerHostRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const mutedRef = useRef(muted);
   const loadedVideoIdRef = useRef<string | null>(null);
+  const soundFallbackRef = useRef<number | null>(null);
+  const hasPlayedRef = useRef(false);
 
   useEffect(() => {
     mutedRef.current = muted;
@@ -193,6 +199,41 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
     setMuted((current) => !current);
   }, [setMuted]);
 
+  const clearSoundFallback = useCallback(() => {
+    if (soundFallbackRef.current === null) return;
+    window.clearTimeout(soundFallbackRef.current);
+    soundFallbackRef.current = null;
+  }, []);
+
+  /**
+   * Toque sobre o vídeo, em três estágios (o estado real vem do player, não
+   * de um espelho local, que dessincroniza fácil):
+   *   tocando + mudo    → liga o som
+   *   tocando + com som → pausa
+   *   pausado           → retoma, preservando a preferência de som
+   */
+  const handleStageTap = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+
+    // A partir daqui quem manda é o usuário: mata qualquer fallback pendente
+    // pra ele não desfazer o pause/som logo em seguida.
+    clearSoundFallback();
+
+    if (player.getPlayerState() !== YT_PLAYING) {
+      player.playVideo();
+      return;
+    }
+
+    if (mutedRef.current) {
+      player.unMute();
+      setMuted(false);
+      return;
+    }
+
+    player.pauseVideo();
+  }, [clearSoundFallback, setMuted]);
+
   const handlePrevious = useCallback(() => {
     goToIndex(activeIndexRef.current - 1);
   }, [goToIndex]);
@@ -257,9 +298,16 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
    * Toca respeitando a preferência de som. Se o navegador recusar o áudio,
    * o vídeo simplesmente não começa — então cai pra mudo em vez de deixar a
    * tela parada. Isso respeita a política de autoplay, não a contorna.
+   *
+   * O fallback é cheio de guardas porque ele não pode confundir "o navegador
+   * bloqueou" com "o usuário mexeu": qualquer engano aqui vira vídeo mudando
+   * de estado sozinho.
    */
   const startPlayback = useCallback(
     (player: YTPlayer) => {
+      clearSoundFallback();
+      hasPlayedRef.current = false;
+
       if (mutedRef.current) {
         player.mute();
         player.playVideo();
@@ -269,16 +317,24 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
       player.unMute();
       player.playVideo();
 
-      window.setTimeout(() => {
+      soundFallbackRef.current = window.setTimeout(() => {
+        soundFallbackRef.current = null;
+
         if (playerRef.current !== player) return;
-        if (player.getPlayerState() === YT_PLAYING) return;
+        // Chegou a tocar: o áudio foi liberado. Se parou depois disso, foi o
+        // usuário — não é caso de fallback.
+        if (hasPlayedRef.current) return;
+
+        const state = player.getPlayerState();
+        // Pausado = o usuário pausou. Buffering = está a caminho, só lento.
+        if (state === YT_PAUSED || state === YT_BUFFERING) return;
 
         player.mute();
         player.playVideo();
         setMuted(true);
       }, 1200);
     },
-    [setMuted],
+    [clearSoundFallback, setMuted],
   );
 
   /**
@@ -315,6 +371,12 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
         events: {
           onReady: (event) => startPlayback(event.target),
           onStateChange: (event) => {
+            if (event.data === YT_PLAYING) {
+              hasPlayedRef.current = true;
+              setIsPlaying(true);
+            }
+            if (event.data === YT_PAUSED) setIsPlaying(false);
+
             if (event.data !== YT_ENDED) return;
             event.target.seekTo(0, true);
             event.target.playVideo();
@@ -402,6 +464,9 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   useEffect(
     () => () => {
       if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
+      if (soundFallbackRef.current) {
+        window.clearTimeout(soundFallbackRef.current);
+      }
       cancelScrollRef.current();
     },
     [],
@@ -566,7 +631,8 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
                 slide={slide}
                 index={index}
                 muted={muted}
-                onToggleSound={handleToggleMuted}
+                isPlaying={isPlaying}
+                onTap={handleStageTap}
               />
             ))}
           </div>

@@ -417,6 +417,9 @@
   height: 100dvh;
   z-index: 2;
   pointer-events: none;
+  /* Nasce escondida: só aparece quando o player reporta que está tocando. */
+  opacity: 0;
+  transition: opacity 0.18s ease;
 }
 
 .playerLayerInner {

@@ -93,12 +93,26 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const playerHostRef = useRef<HTMLDivElement | null>(null);
+  /** Só recebe valor no onReady — ver comentário na criação do player. */
   const playerRef = useRef<YTPlayer | null>(null);
+  const playerCreatedRef = useRef(false);
   const mutedRef = useRef(muted);
   const loadedVideoIdRef = useRef<string | null>(null);
   const soundFallbackRef = useRef<number | null>(null);
   const hasPlayedRef = useRef(false);
   const progressFillRef = useRef<HTMLSpanElement | null>(null);
+  const playerLayerRef = useRef<HTMLDivElement | null>(null);
+
+  /**
+   * O player só aparece quando está de fato tocando. Entre o fim de uma aula
+   * e o início da próxima ele exibiria a tela final do YouTube (a thumb do
+   * vídeo que acabou) já na posição do slide seguinte — escondê-lo deixa o
+   * pôster do slide correto à mostra durante a transição.
+   */
+  const setPlayerVisible = useCallback((visible: boolean) => {
+    if (!playerLayerRef.current) return;
+    playerLayerRef.current.style.opacity = visible ? "1" : "0";
+  }, []);
 
   useEffect(() => {
     mutedRef.current = muted;
@@ -362,13 +376,14 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
 
     loadYouTubeApi().then((YT) => {
       const host = playerHostRef.current;
-      if (cancelled || !host || playerRef.current) return;
+      if (cancelled || !host || playerCreatedRef.current) return;
+      playerCreatedRef.current = true;
 
       const slide =
         loopSlides[activeIndexRef.current] ?? loopSlides[BASE_LENGTH];
       loadedVideoIdRef.current = slide.videoId;
 
-      playerRef.current = new YT.Player(host, {
+      new YT.Player(host, {
         videoId: slide.videoId,
         playerVars: {
           controls: 0,
@@ -380,16 +395,36 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
           fs: 0,
         },
         events: {
-          onReady: (event) => startPlayback(event.target),
+          onReady: (event) => {
+            // Só publica o player aqui: o construtor devolve o objeto na
+            // hora, mas os métodos (getDuration, getPlayerState...) só são
+            // anexados depois do handshake com o iframe. Publicar antes faz
+            // qualquer chamada estourar "is not a function".
+            playerRef.current = event.target;
+
+            // O usuário pode ter rolado enquanto o player carregava: garante
+            // que quem toca é a aula que está na tela agora.
+            const current =
+              loopSlides[activeIndexRef.current] ?? loopSlides[BASE_LENGTH];
+
+            if (loadedVideoIdRef.current !== current.videoId) {
+              loadedVideoIdRef.current = current.videoId;
+              event.target.loadVideoById(current.videoId);
+            }
+
+            startPlayback(event.target);
+          },
           onStateChange: (event) => {
             if (event.data === YT_PLAYING) {
               hasPlayedRef.current = true;
               setIsPlaying(true);
+              setPlayerVisible(true);
             }
             if (event.data === YT_PAUSED) setIsPlaying(false);
 
             // Fim da aula: segue pra próxima, como num feed de stories.
             if (event.data !== YT_ENDED) return;
+            setPlayerVisible(false);
             handleNextRef.current();
           },
         },
@@ -399,7 +434,7 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
     return () => {
       cancelled = true;
     };
-  }, [loopSlides, playerOpen, startPlayback]);
+  }, [loopSlides, playerOpen, setPlayerVisible, startPlayback]);
 
   /**
    * Troca de aula: mesmo player, vídeo novo (loadVideoById, nunca src novo).
@@ -419,11 +454,14 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
       // Zera na hora: se o segmento ativo for o mesmo índice da aula anterior,
       // React reusa o elemento e a largura antiga ficaria até o próximo tick.
       if (progressFillRef.current) progressFillRef.current.style.width = "0%";
+      // Esconde até a aula nova tocar, senão o último quadro da anterior
+      // aparece no slide novo enquanto o vídeo carrega.
+      setPlayerVisible(false);
       player.loadVideoById(activeSlide.videoId);
     }
 
     startPlayback(player);
-  }, [activeSlide, playerOpen, startPlayback]);
+  }, [activeSlide, playerOpen, setPlayerVisible, startPlayback]);
 
   /** Botão de som: aplica direto no player já vivo. */
   useEffect(() => {
@@ -664,6 +702,7 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
               que é exatamente o que precisamos evitar.
             */}
             <div
+              ref={playerLayerRef}
               className={styles.playerLayer}
               style={{ ["--slide-offset" as string]: activeIndex }}
               aria-hidden="true"

@@ -65,7 +65,7 @@ export function extractYoutubeId(url: string): string {
 }
 
 export function youtubeThumbnail(videoId: string): string {
-  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+  return `https://i.ytimg.com/vi/${videoId}/oar2.jpg`
 }
 
 /** Hash determinístico (FNV-1a) que encurta a URL de origem do vídeo em um id curto e estável. */

@@ -41,7 +41,7 @@ export function AcademyLessonSlide({
 
   const embedSrc = useMemo(() => {
     const params = new URLSearchParams({
-      autoplay: "1",
+      autoplay: isActive ? "1" : "0",
       mute: committedMuted ? "1" : "0",
       controls: "0",
       rel: "0",
@@ -54,7 +54,7 @@ export function AcademyLessonSlide({
     });
 
     return `https://www.youtube-nocookie.com/embed/${slide.videoId}?${params.toString()}`;
-  }, [slide.videoId, committedMuted]);
+  }, [slide.videoId, committedMuted, isActive]);
 
   const sendCommand = useCallback(
     (command: string, args: (string | number)[] = []) => {
@@ -147,7 +147,7 @@ export function AcademyLessonSlide({
           <iframe
             ref={frameRef}
             className={styles.player}
-            src={isActive ? embedSrc : `${embedSrc}&autoplay=0`}
+            src={embedSrc}
             title={slide.lesson.title}
             loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

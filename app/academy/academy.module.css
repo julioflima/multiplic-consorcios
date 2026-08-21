@@ -662,6 +662,20 @@
   .desktopNavButton:active {
     transform: scale(0.96);
   }
+
+  /*
+   * scroll-snap-type: mandatory + scroll-snap-stop: always força parar em
+   * toda aula — ótimo pro gesto de swipe, mas no mouse wheel (que entrega
+   * vários deltas pequenos) isso trava a rolagem lutando contra cada tick.
+   * No desktop a navegação precisa já é feita pelas setas/teclado.
+   */
+  .feed {
+    scroll-snap-type: y proximity;
+  }
+
+  .slide {
+    scroll-snap-stop: normal;
+  }
 }
 
 /* ---------- Rodapé Multiplic ---------- */

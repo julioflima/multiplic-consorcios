@@ -352,6 +352,7 @@
 .feed {
   position: absolute;
   inset: 0;
+  height: 100dvh;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
@@ -365,7 +366,7 @@
 
 .slide {
   position: relative;
-  height: 100svh;
+  height: 100dvh;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   display: flex;
@@ -407,8 +408,8 @@
   inset: auto;
   top: 50%;
   left: 50%;
-  width: max(118vw, 66.4svh);
-  height: max(209.8vw, 118svh);
+  width: max(118vw, 66.4dvh);
+  height: max(209.8vw, 118dvh);
   transform: translate(-50%, -50%);
   pointer-events: none;
 }

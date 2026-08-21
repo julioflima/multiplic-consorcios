@@ -20,6 +20,46 @@ const LOOP_COPIES = 3;
 
 const BASE_LENGTH = ACADEMY_SLIDES.length;
 
+function easeInOutCubic(t: number) {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+}
+
+/**
+ * scrollIntoView({behavior:"smooth"}) não dá controle de duração/curva e
+ * varia demais entre navegadores (Chrome é abrupto, Safari tem bugs com
+ * containers de scroll aninhados). Anima o scrollTop manualmente pra ter
+ * uma transição consistente. Retorna uma função pra cancelar se um novo
+ * scroll for disparado no meio da animação.
+ */
+function animateScrollTo(
+  container: HTMLElement,
+  targetTop: number,
+  duration = 420,
+) {
+  const startTop = container.scrollTop;
+  const distance = targetTop - startTop;
+
+  if (distance === 0) return () => {};
+
+  const startTime = performance.now();
+  let cancelled = false;
+
+  const step = (now: number) => {
+    if (cancelled) return;
+
+    const progress = Math.min((now - startTime) / duration, 1);
+    container.scrollTop = startTop + distance * easeInOutCubic(progress);
+
+    if (progress < 1) requestAnimationFrame(step);
+  };
+
+  requestAnimationFrame(step);
+
+  return () => {
+    cancelled = true;
+  };
+}
+
 interface AcademyExperienceProps {
   /** Id da aula vinda da URL (/academy/[shareId]), já resolvida no servidor. */
   initialShareId?: string;
@@ -40,6 +80,7 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   const pendingIndexRef = useRef<number | null>(null);
   const activeIndexRef = useRef(activeIndex);
   const idleTimerRef = useRef<number | null>(null);
+  const cancelScrollRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
@@ -85,10 +126,17 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
 
   const scrollToIndex = useCallback(
     (index: number, behavior: ScrollBehavior = "smooth") => {
-      const target = containerRef.current?.children[index] as
-        | HTMLElement
-        | undefined;
-      target?.scrollIntoView({ behavior, block: "start" });
+      const container = containerRef.current;
+      const target = container?.children[index] as HTMLElement | undefined;
+      if (!container || !target) return;
+
+      cancelScrollRef.current();
+
+      if (behavior === "smooth") {
+        cancelScrollRef.current = animateScrollTo(container, target.offsetTop);
+      } else {
+        container.scrollTop = target.offsetTop;
+      }
     },
     [],
   );
@@ -228,6 +276,7 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   useEffect(
     () => () => {
       if (idleTimerRef.current) window.clearTimeout(idleTimerRef.current);
+      cancelScrollRef.current();
     },
     [],
   );

@@ -27,6 +27,11 @@ export function AcademyLessonSlide({
   onToggleSound,
 }: AcademyLessonSlideProps) {
   const frameRef = useRef<HTMLIFrameElement | null>(null);
+  const mutedRef = useRef(muted);
+
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
 
   const embedSrc = useMemo(() => {
     const params = new URLSearchParams({
@@ -66,6 +71,7 @@ export function AcademyLessonSlide({
         JSON.stringify({ event: "listening", id: `slide-${index}` }),
         "*",
       );
+      sendCommand(mutedRef.current ? "mute" : "unMute");
     };
 
     const interval = window.setInterval(subscribe, 600);

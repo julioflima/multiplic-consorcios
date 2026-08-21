@@ -4,6 +4,7 @@ import { Fraunces, Manrope } from 'next/font/google'
 import './globals.css'
 
 import { SITE_URL } from '@/lib/seo'
+import { Providers } from './providers'
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -48,7 +49,9 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="pt-BR" className={`${fraunces.variable} ${manrope.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }

@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ACADEMY_PAGE, ACADEMY_SLIDES, findSlideIndex } from "./academy-data";
 import { AcademyBrowse } from "./academy-browse";
 import { AcademyLessonSlide } from "./academy-lesson-slide";
+import { useAcademyMuted } from "./use-academy-muted";
 import styles from "./academy.module.css";
 
 /** Cópias da trilha para simular o feed vertical infinito. */
@@ -17,7 +18,7 @@ const BASE_LENGTH = ACADEMY_SLIDES.length;
 export function AcademyExperience() {
   const [playerOpen, setPlayerOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(BASE_LENGTH);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useAcademyMuted();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pendingIndexRef = useRef<number | null>(null);

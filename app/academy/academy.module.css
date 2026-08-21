@@ -349,6 +349,10 @@
   overflow: hidden;
 }
 
+.playerOverlayHidden {
+  display: none;
+}
+
 .feed {
   position: absolute;
   inset: 0;
@@ -390,7 +394,6 @@
   opacity: 0.16;
 }
 
-.player,
 .poster {
   position: absolute;
   inset: 0;
@@ -400,17 +403,40 @@
 }
 
 /*
+ * Camada do player único. Fica sticky no topo do feed (altura 0 pra não
+ * ocupar espaço nem virar ponto de snap) e o filho cobre a viewport, sempre
+ * sobre o slide ativo. z-index 2: acima dos pôsteres, abaixo da UI (5+).
+ */
+.playerLayer {
+  position: sticky;
+  top: 0;
+  height: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.playerLayerInner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/*
  * Mobile: imersão total. O iframe recebe exatamente 9:16 e é dimensionado para
  * cobrir o palco (corta topo/base quando a tela é mais alta), então o vídeo
  * preenche a tela inteira e a UI nativa do YouTube fica fora do recorte.
  */
-.player {
-  inset: auto;
+.playerLayerInner iframe {
+  position: absolute;
   top: 50%;
   left: 50%;
   width: max(118vw, 66.4dvh);
   height: max(209.8vw, 118dvh);
   transform: translate(-50%, -50%);
+  border: 0;
   pointer-events: none;
 }
 
@@ -423,6 +449,8 @@
 .playerVeil {
   position: absolute;
   inset: 0;
+  /* Acima do player (z-index 2) pra manter o degradê sobre o vídeo. */
+  z-index: 3;
   background: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.55) 0%,
@@ -610,7 +638,12 @@
     max-width: min(56.25svh, 100vw);
   }
 
-  .player {
+  .playerLayerInner {
+    max-width: min(56.25svh, 100vw);
+    margin: 0 auto;
+  }
+
+  .playerLayerInner iframe {
     width: 100%;
     height: 136%;
     aspect-ratio: auto;

@@ -13,6 +13,12 @@ import {
 import { AcademyBrowse } from "./academy-browse";
 import { AcademyLessonSlide } from "./academy-lesson-slide";
 import { useAcademyMuted } from "./use-academy-muted";
+import {
+  loadYouTubeApi,
+  YT_ENDED,
+  YT_PLAYING,
+  type YTPlayer,
+} from "./youtube-api";
 import styles from "./academy.module.css";
 
 /** Cópias da trilha para simular o feed vertical infinito. */
@@ -82,6 +88,15 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   const idleTimerRef = useRef<number | null>(null);
   const cancelScrollRef = useRef<() => void>(() => {});
 
+  const playerHostRef = useRef<HTMLDivElement | null>(null);
+  const playerRef = useRef<YTPlayer | null>(null);
+  const mutedRef = useRef(muted);
+  const loadedVideoIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
+
   useEffect(() => {
     activeIndexRef.current = activeIndex;
   }, [activeIndex]);
@@ -127,7 +142,11 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
   const scrollToIndex = useCallback(
     (index: number, behavior: ScrollBehavior = "smooth") => {
       const container = containerRef.current;
-      const target = container?.children[index] as HTMLElement | undefined;
+      // Busca por data-index (e não por children[i]): a camada do player
+      // também é filha do feed, então a posição no DOM ≠ índice do slide.
+      const target = container?.querySelector<HTMLElement>(
+        `[data-index="${index}"]`,
+      );
       if (!container || !target) return;
 
       cancelScrollRef.current();
@@ -227,10 +246,117 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
       { root: container, threshold: 0.6 },
     );
 
-    Array.from(container.children).forEach((child) => observer.observe(child));
+    container
+      .querySelectorAll("[data-index]")
+      .forEach((child) => observer.observe(child));
 
     return () => observer.disconnect();
   }, [playerOpen, scrollToIndex]);
+
+  /**
+   * Toca respeitando a preferência de som. Se o navegador recusar o áudio,
+   * o vídeo simplesmente não começa — então cai pra mudo em vez de deixar a
+   * tela parada. Isso respeita a política de autoplay, não a contorna.
+   */
+  const startPlayback = useCallback(
+    (player: YTPlayer) => {
+      if (mutedRef.current) {
+        player.mute();
+        player.playVideo();
+        return;
+      }
+
+      player.unMute();
+      player.playVideo();
+
+      window.setTimeout(() => {
+        if (playerRef.current !== player) return;
+        if (player.getPlayerState() === YT_PLAYING) return;
+
+        player.mute();
+        player.playVideo();
+        setMuted(true);
+      }, 1200);
+    },
+    [setMuted],
+  );
+
+  /**
+   * UM player para o feed inteiro. O iframe é criado uma única vez e nunca
+   * é recarregado: trocar de aula usa loadVideoById, que mantém o MESMO
+   * documento — e com ele a permissão de áudio que o clique do usuário já
+   * concedeu. Apontar um src novo criaria um documento novo, e aí o
+   * navegador voltaria a exigir mudo.
+   */
+  useEffect(() => {
+    if (!playerOpen) return;
+
+    let cancelled = false;
+
+    loadYouTubeApi().then((YT) => {
+      const host = playerHostRef.current;
+      if (cancelled || !host || playerRef.current) return;
+
+      const slide =
+        loopSlides[activeIndexRef.current] ?? loopSlides[BASE_LENGTH];
+      loadedVideoIdRef.current = slide.videoId;
+
+      playerRef.current = new YT.Player(host, {
+        videoId: slide.videoId,
+        playerVars: {
+          controls: 0,
+          rel: 0,
+          playsinline: 1,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          disablekb: 1,
+          fs: 0,
+        },
+        events: {
+          onReady: (event) => startPlayback(event.target),
+          onStateChange: (event) => {
+            if (event.data !== YT_ENDED) return;
+            event.target.seekTo(0, true);
+            event.target.playVideo();
+          },
+        },
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loopSlides, playerOpen, startPlayback]);
+
+  /**
+   * Troca de aula: mesmo player, vídeo novo (loadVideoById, nunca src novo).
+   * Fechar o overlay pausa — senão o áudio continuaria tocando escondido.
+   */
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player || !activeSlide) return;
+
+    if (!playerOpen) {
+      player.pauseVideo();
+      return;
+    }
+
+    if (loadedVideoIdRef.current !== activeSlide.videoId) {
+      loadedVideoIdRef.current = activeSlide.videoId;
+      player.loadVideoById(activeSlide.videoId);
+    }
+
+    startPlayback(player);
+  }, [activeSlide, playerOpen, startPlayback]);
+
+  /** Botão de som: aplica direto no player já vivo. */
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player) return;
+
+    if (muted) player.mute();
+    else player.unMute();
+  }, [muted]);
 
   useEffect(() => {
     if (!playerOpen) return;
@@ -285,14 +411,21 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
     <main className={styles.shell}>
       <AcademyBrowse onOpenLesson={handleOpenLesson} />
 
-      {playerOpen ? (
-        <div
-          className={styles.playerOverlay}
-          style={{ ["--topic-accent" as string]: activeSlide.topicAccent }}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${ACADEMY_PAGE.title} — player`}
-        >
+      {/*
+        Fica sempre montado (só escondido) de propósito: desmontar destruiria
+        o iframe do player e, com ele, a permissão de áudio já concedida —
+        aí toda reabertura voltaria a começar muda.
+      */}
+      <div
+        className={`${styles.playerOverlay} ${
+          playerOpen ? "" : styles.playerOverlayHidden
+        }`}
+        style={{ ["--topic-accent" as string]: activeSlide.topicAccent }}
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={playerOpen ? undefined : true}
+        aria-label={`${ACADEMY_PAGE.title} — player`}
+      >
           <div className={styles.topBar}>
             <div
               className={styles.progressRow}
@@ -412,13 +545,22 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
             ref={containerRef}
             onScroll={handleFeedScroll}
           >
+            {/*
+              O player único acompanha a rolagem via position: sticky, em vez
+              de ser movido no DOM — reparentar um iframe faz o navegador
+              recarregá-lo, que é exatamente o que precisamos evitar.
+            */}
+            <div className={styles.playerLayer} aria-hidden="true">
+              <div className={styles.playerLayerInner}>
+                <div ref={playerHostRef} />
+              </div>
+            </div>
+
             {loopSlides.map((slide, index) => (
               <AcademyLessonSlide
                 key={slide.loopKey}
                 slide={slide}
                 index={index}
-                isActive={index === activeIndex}
-                isNeighbor={Math.abs(index - activeIndex) === 1}
                 muted={muted}
                 onToggleSound={handleToggleMuted}
               />
@@ -466,8 +608,7 @@ export function AcademyExperience({ initialShareId }: AcademyExperienceProps) {
               </svg>
             </button>
           </div>
-        </div>
-      ) : null}
+      </div>
 
       <SiteFooter className={styles.footer} />
     </main>

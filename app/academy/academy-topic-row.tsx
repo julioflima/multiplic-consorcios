@@ -46,26 +46,31 @@ export function AcademyTopicRow({
   )
 
   /**
-   * Mede a largura de UM conjunto a partir de um item + gap + padding, em vez
-   * de usar scrollWidth: assim o resultado não depende de quantas cópias
-   * estão renderizadas no momento, o que evita realimentar o ResizeObserver.
+   * Mede UM conjunto pela distância entre o primeiro e o último item dele —
+   * não por scrollWidth, que dependeria de quantas cópias estão na tela (e o
+   * número de cópias é justamente o que esta medição decide, o que realimen-
+   * taria o ResizeObserver).
+   *
+   * offsetLeft/offsetWidth de propósito: ignoram transform, então o scale do
+   * hover não infla a medida como getBoundingClientRect() faria.
    */
   useEffect(() => {
     const track = trackRef.current
     if (!track) return
 
     const measure = () => {
-      const item = track.firstElementChild as HTMLElement | null
-      if (!item) return
+      const items = Array.from(track.children) as HTMLElement[]
+      const count = Math.min(topic.lessons.length, items.length)
+      if (count === 0) return
+
+      const first = items[0]
+      const last = items[count - 1]
+      // A diferença entre os offsets já inclui os gaps intermediários.
+      const setWidth = last.offsetLeft + last.offsetWidth - first.offsetLeft
 
       const trackStyle = getComputedStyle(track)
-      const gap = parseFloat(trackStyle.columnGap) || 0
       const padding =
         parseFloat(trackStyle.paddingLeft) + parseFloat(trackStyle.paddingRight)
-
-      const count = topic.lessons.length
-      const setWidth =
-        count * item.getBoundingClientRect().width + (count - 1) * gap
 
       // +1px de tolerância pra arredondamento de subpixel não ligar o loop à toa.
       setOverflows(setWidth + padding > track.clientWidth + 1)
